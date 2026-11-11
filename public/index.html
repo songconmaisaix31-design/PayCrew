@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#182439">
+  <title>PayCrew · Disputes</title>
+  <style>
+    :root {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #1d2a3c;
+      background: #f5f7fb;
+      font-synthesis: none;
+      --nav: #182439;
+      --surface: #fff;
+      --muted: #56657b;
+      --subtle: #64748b;
+      --border: #e3e8f1;
+      --accent: #5348b8;
+      --accent-dark: #41379e;
+      --accent-soft: #efedfc;
+      --shadow: 0 2px 4px #1d2a3c06, 0 6px 14px #1d2a3c04;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-width: 300px; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: default; opacity: .65; }
+    button[aria-busy="true"] { cursor: wait; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #9386f6; outline-offset: 2px;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    h1, h2, h3, p, dl, dd { margin: 0; }
+    [hidden] { display: none !important; }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.65;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .app { display: grid; grid-template-columns: 219px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 27px 16px 18px;
+      background: var(--nav);
+      color: #f7f8fc;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; margin: 0 9px 49px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: #a99df8;
+      color: #231d59;
+    }
+    .brand-mark .icon { width: 24px; height: 24px; stroke-width: 1.9; }
+    .brand-name { font-size: 21px; font-weight: 730; letter-spacing: -.8px; }
+    .nav-label {
+      margin: 0 10px 10px;
+      font-size: 10px;
+      font-weight: 680;
+      letter-spacing: 1.25px;
+      text-transform: uppercase;
+      color: #aebbd0;
+    }
+    .nav-current {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 11px;
+      border-radius: 8px;
+      color: #f6f5ff;
+      background: #343657;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 620;
+    }
+    .nav-current .icon { color: #c5baff; }
+    .nav-current .nav-indicator { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #b5a8ff; }
+    .sidebar-foot {
+      margin-top: auto;
+      padding: 12px 11px;
+      border: 1px solid #38465c;
+      border-radius: 9px;
+    }
+    .sidebar-foot-title { display: flex; align-items: center; gap: 8px; color: #edf1f8; font-size: 12px; font-weight: 630; }
+    .sidebar-foot-title .icon { color: #b5a8ff; width: 15px; height: 15px; }
+    .sidebar-foot p { margin-top: 5px; color: #aebbd0; font-size: 11px; }
+
+    .main { min-width: 0; }
+    .topbar {
+      min-height: 66px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px clamp(18px, 3.3vw, 46px);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .breadcrumbs { display: flex; align-items: center; gap: 10px; color: var(--subtle); font-size: 13px; }
+    .breadcrumbs .icon { width: 13px; height: 13px; }
+    .breadcrumbs strong { color: #27344a; font-weight: 650; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .source {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-radius: 999px;
+      background: #edf0f5;
+      color: #495970;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .source::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .source-fixture { background: #fff0d8; color: #82500d; }
+    .source-sandbox { background: #e2f5ee; color: #22694f; }
+    .button {
+      min-height: 37px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      color: #38445a;
+      border: 1px solid #dce3ee;
+      background: var(--surface);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 660;
+      white-space: nowrap;
+    }
+    .button .icon { width: 15px; height: 15px; }
+    .button:hover:not(:disabled) { background: #f5f6fd; border-color: #cbc6ef; }
+    .button-primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+    .button-primary:hover:not(:disabled) { color: #fff; background: var(--accent-dark); border-color: var(--accent-dark); }
+    .button-link { color: var(--accent-dark); background: transparent; border: 1px solid transparent; padding-inline: 6px; }
+    .button-link:hover:not(:disabled) { border-color: #e2dff8; }
+
+    .workspace { max-width: 1530px; margin: auto; padding: 31px clamp(18px, 3.3vw, 46px) 42px; }
+    .page-title { font-size: clamp(29px, 3vw, 39px); font-weight: 740; letter-spacing: -1.6px; line-height: 1.1; }
+    .page-description { color: var(--muted); font-size: 14px; margin-top: 9px; line-height: 1.5; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin: 23px 0; }
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .stat-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; flex: 0 0 auto; }
+    .stat-icon.violet { background: #efedfc; color: #5549b5; }
+    .stat-icon.amber { background: #fff3de; color: #865415; }
+    .stat-icon.green { background: #e5f5ee; color: #22694f; }
+    .stat-label { color: var(--muted); font-size: 11px; line-height: 1.2; }
+    .stat-value { margin-top: 4px; font-size: 22px; font-weight: 700; letter-spacing: -.5px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+    .panes { display: grid; grid-template-columns: minmax(265px, .8fr) minmax(0, 1.25fr); align-items: start; gap: 18px; }
+    .card { min-width: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+    .queue-top { padding: 17px 17px 13px; border-bottom: 1px solid var(--border); }
+    .queue-title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .queue-title h2, .section-title { font-size: 16px; font-weight: 720; letter-spacing: -.25px; }
+    .count { background: #f0f2f7; border-radius: 999px; padding: 2px 7px; color: #536279; font-size: 11px; font-weight: 690; }
+    .search-row { display: flex; gap: 7px; }
+    .search-field { position: relative; flex: 1; min-width: 0; }
+    .search-field .icon { position: absolute; left: 9px; top: 9px; color: #63738b; width: 15px; height: 15px; pointer-events: none; }
+    input, textarea, select {
+      color: #29364c;
+      background: #fff;
+      border: 1px solid #dce3ee;
+      border-radius: 7px;
+      min-width: 0;
+      font-size: 12px;
+    }
+    input::placeholder, textarea::placeholder { color: #64738a; opacity: 1; }
+    .search-field input { width: 100%; min-height: 34px; padding: 6px 8px 6px 29px; }
+    .search-row select { width: 99px; min-height: 34px; padding: 5px 4px 5px 7px; font-size: 11px; }
+    .queue-list { display: grid; gap: 3px; padding: 7px; max-height: min(620px, 66vh); overflow: auto; }
+    .case-row {
+      position: relative;
+      min-width: 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      text-align: left;
+      gap: 4px 8px;
+      padding: 11px 10px 11px 13px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+    }
+    .case-row:hover { background: #f7f8fb; }
+    .case-row[aria-pressed="true"] { background: #f3f1ff; border-color: #e2ddff; }
+    .case-row[aria-pressed="true"]::before { content: ""; position: absolute; left: 0; top: 11px; bottom: 11px; width: 3px; border-radius: 0 3px 3px 0; background: #7567d3; }
+    .case-name { color: #26334b; font-size: 13px; font-weight: 700; min-width: 0; }
+    .case-id { color: #586a83; font-size: 11px; overflow-wrap: anywhere; align-self: center; }
+    .case-amount { color: #27344a; justify-self: end; font-size: 13px; font-weight: 720; text-align: right; font-variant-numeric: tabular-nums; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 3px 7px;
+      border-radius: 999px;
+      color: #4e5d73;
+      background: #eef1f6;
+      font-size: 10px;
+      font-weight: 690;
+      line-height: 1.3;
+    }
+    .case-row .status { justify-self: end; text-align: right; }
+    .status.response { color: #865016; background: #fff0d6; }
+    .status.review { color: #4b40a6; background: #eae7fa; }
+    .status.resolved { color: #22694f; background: #e3f4eb; }
+    .status.open { color: #335f8b; background: #e7f0fb; }
+    .queue-foot { border-top: 1px solid var(--border); padding: 10px 17px; font-size: 11px; color: var(--subtle); }
+
+    .detail { padding: 17px 19px 19px; }
+    .detail-heading { display: flex; align-items: flex-start; gap: 10px; justify-content: space-between; }
+    .detail-heading .status { margin-top: 3px; font-size: 11px; text-align: right; }
+    .detail-title { font-size: 21px; font-weight: 735; letter-spacing: -.55px; overflow-wrap: anywhere; }
+    .detail-id { margin-top: 4px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .detail-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0 16px;
+      padding: 10px 12px;
+      border: 1px solid #e8ecf3;
+      border-radius: 8px;
+      background: #f8f9fc;
+    }
+    .detail-meta dt { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; color: var(--muted); font-size: 11px; }
+    .detail-meta .icon { width: 13px; height: 13px; }
+    .detail-meta dd { color: #27344a; font-size: 13px; font-weight: 690; overflow-wrap: anywhere; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .section-description { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .evidence-rows { display: grid; gap: 11px; margin: 10px 0 15px; }
+    .evidence-row { display: grid; grid-template-columns: minmax(0, 1fr) 30px; gap: 5px 6px; }
+    .evidence-row label { display: block; margin-bottom: 4px; color: #45536a; font-size: 11px; font-weight: 650; }
+    .evidence-row input, .evidence-row textarea { display: block; width: 100%; padding: 7px 9px; line-height: 1.4; }
+    .evidence-text { grid-column: 1 / -1; }
+    .evidence-row textarea { min-height: 56px; resize: vertical; }
+    .icon-button { align-self: end; width: 30px; min-height: 32px; padding: 0; }
+    .icon-button .icon { width: 14px; height: 14px; }
+    .draft-panel {
+      margin-top: 7px;
+      padding: 12px 13px;
+      border: 1px solid #e6e1fb;
+      border-radius: 9px;
+      background: #f9f7ff;
+    }
+    .draft-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .draft-label { display: flex; gap: 8px; align-items: center; color: #41368d; font-size: 14px; font-weight: 720; }
+    .draft-label .icon { width: 16px; height: 16px; }
+    .draft-description { margin-top: 3px; color: #5b5479; font-size: 11px; line-height: 1.5; }
+    .draft-output { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e6e1fb; }
+    .draft-output h3 { color: #343051; font-size: 12px; margin-bottom: 5px; }
+    .draft-output p, .draft-output ul { color: #4c466b; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .draft-output ul { padding-left: 17px; margin: 0; }
+    .draft-output li + li { margin-top: 4px; }
+    .draft-output section + section { margin-top: 12px; }
+    .draft-output .response-text { margin: 0; padding: 9px 10px; background: #fff; border: 1px solid #e7e3f7; border-radius: 7px; white-space: pre-wrap; }
+    .draft-output .section-heading { margin-bottom: 3px; }
+    .draft-output .section-heading h3 { margin-bottom: 0; }
+    .draft-output .section-heading .button { min-height: 28px; padding-block: 3px; }
+    .draft-output .model-note { margin-top: 12px; color: var(--subtle); font-size: 11px; }
+    .draft-message { margin-top: 7px; color: #5b5479; font-size: 11px; line-height: 1.5; }
+    .draft-message.error, .evidence-error { color: #963d3d; }
+    .evidence-error { margin: -5px 0 10px; font-size: 12px; line-height: 1.5; }
+    .review-panel { margin-top: 13px; padding-top: 12px; border-top: 1px solid #e6e1fb; }
+    .review-panel label { display: block; margin-top: 9px; color: #45536a; font-size: 12px; font-weight: 650; }
+    .review-panel textarea { display: block; width: 100%; min-height: 116px; margin-top: 5px; padding: 8px 10px; line-height: 1.55; resize: vertical; }
+    .review-panel .review-confirmation { display: flex; align-items: flex-start; gap: 7px; font-weight: 500; line-height: 1.5; }
+    .review-confirmation input { margin: 2px 0 0; accent-color: var(--accent); }
+    .review-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px 10px; margin-top: 10px; }
+
+    .message { padding: 28px 12px; text-align: center; color: var(--muted); }
+    .message .message-icon { display: grid; place-items: center; margin: 0 auto 8px; width: 34px; height: 34px; border-radius: 8px; color: #6055ad; background: #f0eefb; }
+    .message .message-icon .icon { width: 16px; height: 16px; }
+    .message h3 { font-size: 13px; font-weight: 720; color: #2d394e; }
+    .message p { margin-top: 5px; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+    .message button { margin-top: 9px; }
+    .detail-placeholder { min-height: 220px; display: grid; place-items: center; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 1120px) {
+      .app { grid-template-columns: 175px minmax(0, 1fr); }
+      .sidebar { padding-inline: 12px; }
+    }
+    @media (max-width: 930px) {
+      .app { grid-template-columns: 70px minmax(0, 1fr); }
+      .sidebar { padding-inline: 12px; align-items: center; }
+      .brand { margin: 0 0 31px; }
+      .brand-name, .nav-label, .nav-text, .nav-current .nav-indicator, .sidebar-foot p, .sidebar-foot-title span { display: none; }
+      .nav-current, .sidebar-foot { padding: 10px; }
+      .sidebar-foot-title .icon { width: 18px; height: 18px; }
+    }
+    @media (max-width: 710px) {
+      .app { display: block; }
+      .sidebar { position: static; height: auto; flex-direction: row; justify-content: space-between; padding: 10px 16px; }
+      .brand { margin: 0; }
+      .brand-name { display: block; font-size: 18px; }
+      .brand-mark { width: 30px; height: 30px; border-radius: 8px; }
+      .brand-mark .icon { width: 20px; height: 20px; }
+      .sidebar-foot { display: none; }
+      .nav-current { padding: 7px 9px; font-size: 12px; }
+      .nav-current .icon { width: 15px; height: 15px; }
+      .nav-text { display: inline; }
+      .topbar { min-height: 52px; }
+      .workspace { padding-top: 24px; }
+      .panes { grid-template-columns: minmax(0, 1fr); }
+      .queue-list { max-height: 310px; }
+      .stats { gap: 6px; margin-block: 16px; }
+      .stat { gap: 5px; padding: 8px 6px; }
+      .stat-icon { width: 24px; height: 24px; border-radius: 6px; }
+      .stat-icon .icon { width: 13px; height: 13px; }
+      .stat-label { font-size: 10px; }
+      .stat-value { font-size: 16px; }
+    }
+    @media (max-width: 380px) {
+      .breadcrumbs { gap: 4px; font-size: 11px; }
+      .topbar, .workspace { padding-inline: 11px; }
+      .topbar-actions { gap: 5px; }
+      .refresh-label { display: none; }
+      .draft-head { align-items: stretch; flex-direction: column; }
+      .draft-head .button { align-self: start; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .button, .case-row { transition: background-color .14s ease, border-color .14s ease; }
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-brand" viewBox="0 0 24 24"><path d="M4.5 5h8.7a4.4 4.4 0 0 1 0 8.8H8.6l-1.3 5.3M9.6 9.5h5.7a4.4 4.4 0 0 1 0 8.8h-2.2l-.6 2.2"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 6.8A1.8 1.8 0 0 1 5.8 5h12.4A1.8 1.8 0 0 1 20 6.8v10.4a1.8 1.8 0 0 1-1.8 1.8H5.8A1.8 1.8 0 0 1 4 17.2z"/><path d="M4 13h4.4l1.3 2.2h4.6l1.3-2.2H20"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 5 6v5.6c0 4.2 2.6 6.7 7 8.9 4.4-2.2 7-4.7 7-8.9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 8a8 8 0 0 0-13-1.5L4 9m0 0V4m0 5h5m-4.5 7a8 8 0 0 0 13 1.5L20 15m0 0v5m0-5h-5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.3 2.4 4.8-4.9"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.8"/><path d="m15 15 4.5 4.5"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24"><rect x="4" y="6.5" width="16" height="11" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M7 12h.5m9 0h.5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="5" y="6" width="14" height="13" rx="2"/><path d="M8.5 4.5v3m7-3v3M5 10h14"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M9 7V4.5h6V7m2.5 0-.9 12h-9l-.9-12M10 10v5.5m4-5.5v5.5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M10 3.5 11.7 9l5.3 1.8-5.3 1.7L10 18l-1.8-5.5L3 10.8 8.2 9zM18 13l1.1 3 2.9 1-2.9 1-1.1 3-1-3-3-1 3-1z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M6 16H5V5h11v1"/></symbol>
+  </svg>
+
+  <div class="app">
+    <aside class="sidebar" aria-label="PayCrew navigation">
+      <div class="brand">
+        <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-brand"/></svg></span>
+        <span class="brand-name">PayCrew</span>
+      </div>
+      <nav>
+        <div class="nav-label">Workspace</div>
+        <a class="nav-current" href="#disputes" aria-current="page" aria-label="Disputes">
+          <svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg>
+          <span class="nav-text">Disputes</span><span class="nav-indicator" aria-hidden="true"></span>
+        </a>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="sidebar-foot-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg><span>Read-only PayPal access</span>
+        </div>
+        <p>Merchant workspace</p>
+      </div>
+    </aside>
+
+    <main class="main" id="disputes">
+      <header class="topbar">
+        <div class="breadcrumbs">
+          <span>Workspace</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><strong>Disputes</strong>
+        </div>
+        <div class="topbar-actions">
+          <span class="source" id="source" role="status">Connecting</span>
+          <button class="button" id="refresh" type="button" aria-label="Refresh disputes">
+            <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><span class="refresh-label">Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <h1 class="page-title">Disputes</h1>
+        <p class="page-description">Review PayPal cases, organize evidence, and prepare a response.</p>
+
+        <div class="stats" role="group" aria-label="Loaded dispute totals">
+          <div class="stat">
+            <span class="stat-icon violet"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg></span>
+            <dl><dt class="stat-label">Cases loaded</dt><dd class="stat-value" id="stat-total">—</dd></dl>
+          </div>
+          <div class="stat">
+            <span class="stat-icon amber"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></span>
+            <dl><dt class="stat-label">Needs seller response</dt><dd class="stat-value" id="stat-response">—</dd></dl>
+          </div>
+          <div class="stat">
+            <span class="stat-icon green"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>
+            <dl><dt class="stat-label">Resolved</dt><dd class="stat-value" id="stat-resolved">—</dd></dl>
+          </div>
+        </div>
+
+        <div class="panes">
+          <section class="card queue" aria-labelledby="queue-title">
+            <div class="queue-top">
+              <div class="queue-title">
+                <h2 id="queue-title">Case queue</h2><span class="count" id="visible-count" hidden></span>
+              </div>
+              <div class="search-row">
+                <label class="search-field">
+                  <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+                  <span class="visually-hidden">Search cases</span>
+                  <input id="query" type="search" placeholder="Search ID or reason">
+                </label>
+                <label>
+                  <span class="visually-hidden">Filter cases by status</span>
+                  <select id="filter">
+                    <option value="">All statuses</option>
+                    <option value="response">Needs response</option>
+                    <option value="review">Under review</option>
+                    <option value="open">Open</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="queue-list" id="queue" aria-live="polite"></div>
+            <p class="queue-foot" id="queue-foot" hidden></p>
+          </section>
+
+          <section class="card detail" id="detail" aria-label="Dispute details">
+            <div class="detail-placeholder" id="detail-state" aria-live="polite"></div>
+            <div id="detail-body" hidden>
+              <div class="detail-heading">
+                <div>
+                  <h2 class="detail-title" id="detail-title"></h2>
+                  <p class="detail-id" id="detail-id"></p>
+                </div>
+                <span class="status" id="detail-status"></span>
+              </div>
+              <dl class="detail-meta">
+                <div>
+                  <dt><svg class="icon" aria-hidden="true"><use href="#i-cash"/></svg>Disputed amount</dt>
+                  <dd id="detail-amount"></dd>
+                </div>
+                <div>
+                  <dt><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>Seller response due</dt>
+                  <dd id="detail-due"></dd>
+                </div>
+              </dl>
+
+              <section aria-labelledby="evidence-title">
+                <div class="section-heading">
+                  <h3 class="section-title" id="evidence-title">Evidence</h3>
+                  <button class="button button-link" id="add-evidence" type="button">
+                    <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Add evidence
+                  </button>
+                </div>
+                <p class="section-description">Add 1–8 evidence excerpts, such as delivery confirmation or customer messages. Omit personal data and credentials.</p>
+                <div class="evidence-rows" id="evidence-rows"></div>
+                <p class="evidence-error" id="evidence-error" role="alert" hidden></p>
+              </section>
+
+              <section class="draft-panel" aria-labelledby="draft-title">
+                <div class="draft-head">
+                  <div>
+                    <h3 class="draft-label" id="draft-title"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg>AI response draft</h3>
+                    <p class="draft-description">For human review. Verify the draft and citations before using the response.</p>
+                  </div>
+                  <button class="button button-primary" id="generate" type="button">
+                    <svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg><span id="generate-label">Generate draft</span>
+                  </button>
+                </div>
+                <p class="draft-message" id="draft-message" role="status" hidden></p>
+                <div class="draft-output" id="draft-output" hidden>
+                  <section>
+                    <h3>Case summary</h3>
+                    <p id="draft-summary"></p>
+                  </section>
+                  <section>
+                    <h3>Missing evidence</h3>
+                    <div id="draft-missing"></div>
+                  </section>
+                  <section>
+                    <div class="section-heading">
+                      <h3>Proposed response</h3>
+                      <button class="button" id="copy-response" type="button">
+                        <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span id="copy-label">Copy draft</span>
+                      </button>
+                    </div>
+                    <p class="response-text" id="draft-response"></p>
+                  </section>
+                  <section>
+                    <h3>Citations</h3>
+                    <div id="draft-citations"></div>
+                  </section>
+                  <p class="model-note" id="draft-model" hidden></p>
+                  <section class="review-panel" aria-labelledby="review-title">
+                    <h3 id="review-title">Human review</h3>
+                    <p>Edit the response as needed and verify it against the evidence before downloading the packet.</p>
+                    <label for="final-response">Final response</label>
+                    <textarea id="final-response" rows="5"></textarea>
+                    <label class="review-confirmation" for="review-confirmation">
+                      <input id="review-confirmation" type="checkbox">I verified the final response and its citations against the evidence.
+                    </label>
+                    <div class="review-actions">
+                      <button class="button button-primary" id="download-packet" type="button" disabled>Download evidence packet</button>
+                      <p id="review-message" role="status"></p>
+                    </div>
+                  </section>
+                </div>
+              </section>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const byId = (id) => document.getElementById(id);
+    const refresh = byId('refresh');
+    const source = byId('source');
+    const query = byId('query');
+    const filter = byId('filter');
+    const queue = byId('queue');
+    const detail = byId('detail');
+    const detailState = byId('detail-state');
+    const detailBody = byId('detail-body');
+    const addEvidence = byId('add-evidence');
+    const evidenceRows = byId('evidence-rows');
+    const evidenceError = byId('evidence-error');
+    const generate = byId('generate');
+    const draftOutput = byId('draft-output');
+    const draftMessage = byId('draft-message');
+    const copyResponse = byId('copy-response');
+    const finalResponse = byId('final-response');
+    const reviewConfirmation = byId('review-confirmation');
+    const reviewMessage = byId('review-message');
+    const downloadPacket = byId('download-packet');
+    const evidenceLimits = { count: 8, label: 100, text: 2000 };
+
+    const reasonNames = {
+      MERCHANDISE_OR_SERVICE_NOT_RECEIVED: 'Item not received',
+      MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED: 'Item not as described',
+      UNAUTHORISED: 'Unauthorized transaction',
+      UNAUTHORIZED: 'Unauthorized transaction',
+      CREDIT_NOT_PROCESSED: 'Credit not processed',
+      DUPLICATE_TRANSACTION: 'Duplicate transaction',
+      INCORRECT_AMOUNT: 'Incorrect amount',
+      PAYMENT_BY_OTHER_MEANS: 'Paid by other means'
+    };
+    const statuses = {
+      WAITING_FOR_SELLER_RESPONSE: ['Needs response', 'response'],
+      WAITING_FOR_BUYER_RESPONSE: ['Waiting on buyer', 'open'],
+      UNDER_REVIEW: ['Under review', 'review'],
+      OPEN: ['Open', 'open'],
+      RESOLVED: ['Resolved', 'resolved'],
+      CLOSED: ['Closed', 'resolved'],
+      OTHER: ['Other', '']
+    };
+    const sourceLabels = {
+      fixture: ['Demo data', 'source-fixture', 'Sample cases for demonstration'],
+      sandbox: ['PayPal Sandbox', 'source-sandbox', 'PayPal test environment']
+    };
+    const workspaces = new Map();
+    let sourceName;
+    let items = [];
+    let listState = 'loading';
+    let listError = '';
+    let selectedId;
+    let selectedDispute;
+    let detailRequest;
+    let evidenceSequence = 0;
+
+    function element(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+
+    function icon(name) {
+      const namespace = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(namespace, 'svg');
+      const use = document.createElementNS(namespace, 'use');
+      svg.setAttribute('class', 'icon');
+      svg.setAttribute('aria-hidden', 'true');
+      use.setAttribute('href', '#i-' + name);
+      svg.append(use);
+      return svg;
+    }
+
+    function message(target, title, description, action, glyph = 'inbox') {
+      const box = element('div', 'message');
+      const mark = element('div', 'message-icon');
+      mark.append(icon(glyph));
+      box.append(mark, element('h3', '', title), element('p', '', description));
+      if (action) {
+        const button = element('button', 'button', 'Try again');
+        button.type = 'button';
+        button.addEventListener('click', action);
+        box.append(button);
+      }
+      target.replaceChildren(box);
+    }
+
+    async function request(path, options) {
+      const response = await fetch(path, { headers: { Accept: 'application/json' }, ...options });
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        if (response.ok) throw new Error('The server returned an unreadable response.');
+      }
+      if (!response.ok) {
+        const description = typeof data?.error === 'string' ? data.error : data?.error?.message ?? data?.message;
+        throw new Error(typeof description === 'string' ? description : 'The request failed (' + response.status + ').');
+      }
+      return data;
+    }
+
+    function humanize(value, fallback) {
+      if (typeof value !== 'string' || !value.trim()) return fallback;
+      const words = value.trim().replace(/_/g, ' ').toLowerCase();
+      return words.charAt(0).toUpperCase() + words.slice(1);
+    }
+
+    function reasonName(reason) {
+      return Object.hasOwn(reasonNames, reason) ? reasonNames[reason] : humanize(reason, 'Reason unavailable');
+    }
+
+    function statusInfo(status) {
+      return Object.hasOwn(statuses, status) ? statuses[status] : [humanize(status, 'Status unavailable'), ''];
+    }
+
+    function setStatus(node, status) {
+      const [label, type] = statusInfo(status);
+      node.className = type ? 'status ' + type : 'status';
+      node.textContent = label;
+    }
+
+    function displayAmount(amount) {
+      const rawValue = amount?.value;
+      if (rawValue === undefined || rawValue === null || rawValue === '') return 'Unavailable';
+      const code = amount.currency_code;
+      const value = Number(rawValue);
+      if (!Number.isFinite(value) || !code) return String(rawValue);
+      try {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: code, currencyDisplay: 'code' }).format(value);
+      } catch {
+        return String(code) + ' ' + rawValue;
+      }
+    }
+
+    function displayDate(value) {
+      if (!value) return 'Unavailable';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return 'Unavailable';
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+      }).format(date);
+    }
+
+    function showSource(value) {
+      const [label, style, help] = sourceLabels[value] ?? ['Source unavailable', '', 'The case source could not be determined'];
+      source.className = style ? 'source ' + style : 'source';
+      source.textContent = label;
+      source.title = help;
+    }
+
+    function showStats() {
+      const totals = [
+        ['stat-total', items.length],
+        ['stat-response', items.filter((item) => statusInfo(item.status)[1] === 'response').length],
+        ['stat-resolved', items.filter((item) => statusInfo(item.status)[1] === 'resolved').length]
+      ];
+      for (const [id, count] of totals) byId(id).textContent = listState === 'ready' ? count : '—';
+    }
+
+    function visibleCases() {
+      const search = query.value.trim().toLowerCase();
+      return items.filter((item) => {
+        const searchable = [item.dispute_id, item.reason, reasonName(item.reason)].join(' ').toLowerCase();
+        return (!filter.value || statusInfo(item.status)[1] === filter.value) && searchable.includes(search);
+      });
+    }
+
+    function renderQueue(focusId) {
+      const count = byId('visible-count');
+      const foot = byId('queue-foot');
+      count.hidden = listState !== 'ready';
+      foot.hidden = listState !== 'ready';
+
+      if (listState === 'loading') {
+        message(queue, 'Loading cases', 'Getting your dispute queue.', undefined, 'clock');
+        return;
+      }
+      if (listState === 'error') {
+        message(queue, 'Cases could not be loaded', listError, loadCases);
+        return;
+      }
+
+      const visible = visibleCases();
+      count.textContent = visible.length;
+      foot.textContent = visible.length + ' of ' + items.length + ' cases';
+      if (visible.length === 0) {
+        if (items.length === 0) {
+          message(queue, 'No cases available', 'The connected environment returned an empty dispute queue.');
+        } else {
+          message(queue, 'No matching cases', 'Try another search or status filter.', undefined, 'search');
+        }
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      let toFocus;
+      for (const item of visible) {
+        const button = element('button', 'case-row');
+        button.type = 'button';
+        button.setAttribute('aria-pressed', String(item.dispute_id === selectedId));
+        const status = element('span');
+        setStatus(status, item.status);
+        button.append(
+          element('span', 'case-name', reasonName(item.reason)),
+          element('span', 'case-amount', displayAmount(item.dispute_amount)),
+          element('span', 'case-id', item.dispute_id),
+          status
+        );
+        button.addEventListener('click', () => {
+          if (selectedId !== item.dispute_id) selectCase(item.dispute_id, true);
+        });
+        if (item.dispute_id === focusId) toFocus = button;
+        fragment.append(button);
+      }
+      queue.replaceChildren(fragment);
+      toFocus?.focus({ preventScroll: true });
+    }
+
+    async function loadCases() {
+      if (refresh.disabled) return;
+      refresh.disabled = true;
+      refresh.setAttribute('aria-busy', 'true');
+      const previousSource = sourceName;
+      listState = 'loading';
+      source.textContent = 'Connecting';
+      source.className = 'source';
+      renderQueue();
+      showStats();
+
+      try {
+        const data = await request('/api/disputes');
+        if (!Array.isArray(data?.items)) throw new Error('The dispute list was missing from the response.');
+        sourceName = data.source;
+        if (previousSource && previousSource !== sourceName) {
+          selectedId = undefined;
+          workspaces.clear();
+        }
+        items = data.items.filter((item) => typeof item?.dispute_id === 'string' && item.dispute_id);
+        listState = 'ready';
+        showSource(sourceName);
+        const retained = items.find((item) => item.dispute_id === selectedId);
+        selectCase(retained?.dispute_id ?? visibleCases()[0]?.dispute_id);
+      } catch (error) {
+        listState = 'error';
+        listError = error.message;
+        showSource(undefined);
+        selectCase(undefined);
+      } finally {
+        refresh.disabled = false;
+        refresh.removeAttribute('aria-busy');
+        showStats();
+      }
+    }
+
+    async function selectCase(id, restoreFocus = false) {
+      detailRequest?.abort();
+      selectedId = id;
+      selectedDispute = undefined;
+      detailBody.hidden = true;
+      detailState.hidden = false;
+      renderQueue(restoreFocus ? id : undefined);
+
+      if (!id) {
+        message(detailState, 'Select a dispute', 'Case details and response drafting appear here.');
+        return;
+      }
+
+      message(detailState, 'Loading dispute', 'Getting details for ' + id + '.', undefined, 'clock');
+      const controller = new AbortController();
+      detailRequest = controller;
+      try {
+        const data = await request('/api/disputes/' + encodeURIComponent(id), { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        if (!data?.dispute || data.dispute.dispute_id !== id) throw new Error('The case details did not match the selected dispute.');
+        if (data.source !== sourceName) throw new Error('The case source changed. Refresh the dispute queue to reconnect.');
+        selectedDispute = data.dispute;
+        byId('detail-title').textContent = reasonName(selectedDispute.reason);
+        byId('detail-id').textContent = selectedDispute.dispute_id;
+        setStatus(byId('detail-status'), selectedDispute.status);
+        byId('detail-amount').textContent = displayAmount(selectedDispute.dispute_amount);
+        byId('detail-due').textContent = displayDate(selectedDispute.seller_response_due_date);
+        detailState.hidden = true;
+        detailBody.hidden = false;
+        if (!workspaces.has(id)) {
+          workspaces.set(id, {
+            rows: [newEvidence()], revision: 0, result: null, pending: false, error: '', copyStatus: '',
+            review: { response: null, approvedAt: null, message: '' }
+          });
+        }
+        const workspace = workspaces.get(id);
+        if (draftStaleReason(workspace)) workspace.review.approvedAt = null;
+        renderEvidence();
+        renderDraft();
+      } catch (error) {
+        if (!controller.signal.aborted) message(detailState, 'Case details could not be loaded', error.message, () => selectCase(id));
+      }
+    }
+
+    function newEvidence() {
+      evidenceSequence += 1;
+      return { key: evidenceSequence, label: '', text: '' };
+    }
+
+    function activeWorkspace() {
+      return selectedDispute ? workspaces.get(selectedId) : undefined;
+    }
+
+    function changeEvidence(workspace) {
+      workspace.revision += 1;
+      workspace.copyStatus = '';
+      workspace.review.approvedAt = null;
+      workspace.review.message = '';
+      evidenceError.hidden = true;
+      renderDraft();
+    }
+
+    function makeEvidenceField(workspace, row, key, caption, placeholder, tag = 'input') {
+      const wrapper = element('div', key === 'text' ? 'evidence-text' : '');
+      const label = element('label', '', caption);
+      const input = element(tag);
+      input.id = 'evidence-' + row.key + '-' + key;
+      input.maxLength = evidenceLimits[key];
+      input.placeholder = placeholder;
+      input.value = row[key];
+      label.htmlFor = input.id;
+      input.addEventListener('input', () => {
+        row[key] = input.value;
+        changeEvidence(workspace);
+      });
+      wrapper.append(label, input);
+      return wrapper;
+    }
+
+    function renderEvidence(focusKey) {
+      const workspace = activeWorkspace();
+      evidenceError.hidden = true;
+      if (!workspace) return;
+      addEvidence.disabled = workspace.rows.length >= evidenceLimits.count;
+      const fragment = document.createDocumentFragment();
+      for (const [index, row] of workspace.rows.entries()) {
+        const wrapper = element('div', 'evidence-row');
+        const label = makeEvidenceField(workspace, row, 'label', 'Evidence label · E' + (index + 1), 'e.g. Tracking confirmation');
+        const text = makeEvidenceField(workspace, row, 'text', 'Details', 'e.g. Carrier marked the order delivered on Oct 12.', 'textarea');
+        const remove = element('button', 'button icon-button');
+        remove.type = 'button';
+        remove.setAttribute('aria-label', 'Remove evidence item ' + (index + 1));
+        remove.append(icon('trash'));
+        remove.addEventListener('click', () => {
+          workspace.rows.splice(index, 1);
+          changeEvidence(workspace);
+          const next = workspace.rows[index] ?? workspace.rows[index - 1];
+          renderEvidence(next?.key);
+          if (!next) addEvidence.focus();
+        });
+        wrapper.append(label, remove, text);
+        fragment.append(wrapper);
+      }
+      if (!workspace.rows.length) fragment.append(element('p', 'section-description', 'No evidence added.'));
+      evidenceRows.replaceChildren(fragment);
+      if (focusKey !== undefined) byId('evidence-' + focusKey + '-label')?.focus();
+    }
+
+    function draftEntries(entries) {
+      return Array.isArray(entries) ? entries.filter((entry) => typeof entry === 'string' && entry.trim()) : [];
+    }
+
+    function showItems(target, entries, fallback) {
+      const strings = draftEntries(entries);
+      if (!strings.length) {
+        target.replaceChildren(element('p', '', fallback));
+        return;
+      }
+      const list = element('ul');
+      list.append(...strings.map((entry) => element('li', '', entry)));
+      target.replaceChildren(list);
+    }
+
+    function draftStaleReason(workspace) {
+      const { result, revision } = workspace;
+      if (!result) return '';
+      if (result.revision !== revision) return 'Evidence changed.';
+      if (result.caseReason !== selectedDispute.reason || result.caseStatus !== selectedDispute.status) {
+        return 'Case details changed.';
+      }
+      return '';
+    }
+
+    function responseForReview(workspace) {
+      return workspace.review.response ?? workspace.result.draft.proposedResponse;
+    }
+
+    function canConfirmReview(workspace) {
+      return Boolean(workspace?.result && !workspace.pending && !draftStaleReason(workspace) && responseForReview(workspace).trim());
+    }
+
+    function renderReview(workspace) {
+      const response = responseForReview(workspace);
+      if (finalResponse.value !== response) finalResponse.value = response;
+      const canConfirm = canConfirmReview(workspace);
+      const approved = canConfirm && Boolean(workspace.review.approvedAt);
+      reviewConfirmation.disabled = !canConfirm;
+      reviewConfirmation.checked = approved;
+      downloadPacket.disabled = !approved;
+      const note = workspace.pending || draftStaleReason(workspace) ? '' :
+        approved ? 'Reviewed and ready to download.' : workspace.review.message;
+      if (reviewMessage.textContent !== note) reviewMessage.textContent = note;
+    }
+
+    function renderDraft() {
+      const workspace = activeWorkspace();
+      if (!workspace) return;
+      const { result, pending, error, copyStatus } = workspace;
+      generate.disabled = pending;
+      generate.setAttribute('aria-busy', String(pending));
+      byId('generate-label').textContent = pending ? 'Generating…' : result ? 'Regenerate draft' : 'Generate draft';
+      const staleReason = draftStaleReason(workspace);
+      const note = error || (pending ? 'Preparing a draft…' : staleReason ? staleReason + ' Regenerate the draft to continue review.' : copyStatus);
+      draftMessage.textContent = note;
+      draftMessage.hidden = !note;
+      draftMessage.classList.toggle('error', Boolean(error));
+      draftOutput.hidden = !result;
+      if (!result) return;
+      const { draft, model } = result;
+      byId('draft-summary').textContent = draft.summary || 'Summary unavailable.';
+      showItems(byId('draft-missing'), draft.missingEvidence, 'No missing evidence was identified in this draft.');
+      byId('draft-response').textContent = draft.proposedResponse || 'Proposed response unavailable.';
+      copyResponse.hidden = !draft.proposedResponse;
+      copyResponse.disabled = pending || Boolean(staleReason);
+      byId('copy-label').textContent = copyStatus === 'Draft copied.' ? 'Copied' : 'Copy draft';
+      showItems(byId('draft-citations'), draft.citations, 'This draft contains no citations.');
+      const modelNote = byId('draft-model');
+      modelNote.textContent = typeof model === 'string' && model ? 'Draft model · ' + model : '';
+      modelNote.hidden = !modelNote.textContent;
+      renderReview(workspace);
+    }
+
+    async function generateDraft() {
+      const workspace = activeWorkspace();
+      const id = selectedId;
+      if (!workspace || workspace.pending) return;
+      const evidence = [];
+      for (const row of workspace.rows) {
+        const label = row.label.trim();
+        const text = row.text.trim();
+        if (!label || !text) {
+          evidenceError.textContent = 'Enter a label and details for each evidence item.';
+          evidenceError.hidden = false;
+          byId('evidence-' + row.key + '-' + (label ? 'text' : 'label'))?.focus();
+          return;
+        }
+        evidence.push({ label, text });
+      }
+      if (!evidence.length) {
+        evidenceError.textContent = 'Add at least one evidence excerpt to generate a draft.';
+        evidenceError.hidden = false;
+        addEvidence.focus();
+        return;
+      }
+
+      const revision = workspace.revision;
+      const requestSource = sourceName;
+      const { reason: caseReason, status: caseStatus } = selectedDispute;
+      workspace.pending = true;
+      workspace.error = '';
+      workspace.copyStatus = '';
+      renderDraft();
+      try {
+        const data = await request('/api/disputes/' + encodeURIComponent(id) + '/draft', {
+          method: 'POST',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ evidence })
+        });
+        if (typeof data?.draft?.proposedResponse !== 'string') throw new Error('The draft was missing from the response.');
+        if (data.source !== requestSource) throw new Error('The case source changed. Refresh the dispute queue and generate a new draft.');
+        workspace.result = { ...data, revision, evidence, caseReason, caseStatus };
+        workspace.review.approvedAt = null;
+        workspace.review.message = workspace.review.response === null ? '' : 'Your edits were kept. Verify them against the new draft and evidence.';
+      } catch (error) {
+        workspace.error = error.message;
+      } finally {
+        workspace.pending = false;
+        if (activeWorkspace() === workspace) renderDraft();
+      }
+    }
+
+    function exportEvidencePacket(workspace, caseId) {
+      const { result, review } = workspace;
+      const { draft, evidence, caseReason, caseStatus, model } = result;
+      const evidenceText = evidence.map(({ label, text }, index) => '[E' + (index + 1) + '] ' + label + '\n' + text).join('\n\n');
+      const missing = draftEntries(draft.missingEvidence).map((item) => '- ' + item).join('\n');
+      const packet = [
+        'PayCrew evidence packet',
+        'Case ID: ' + caseId,
+        'Reason: ' + reasonName(caseReason),
+        'Status: ' + statusInfo(caseStatus)[0],
+        'Source: ' + (sourceLabels[result.source]?.[0] ?? result.source),
+        'Reviewed at (UTC): ' + review.approvedAt,
+        '',
+        'Evidence excerpts',
+        evidenceText,
+        '',
+        'Generated draft',
+        'Model: ' + (model || 'Unavailable'),
+        'Case summary',
+        draft.summary || 'Summary unavailable.',
+        '',
+        'Proposed response',
+        draft.proposedResponse || 'Proposed response unavailable.',
+        '',
+        'Missing evidence',
+        missing || 'No missing evidence was identified in this draft.',
+        '',
+        'Draft citations',
+        draftEntries(draft.citations).join(', ') || 'This draft contains no citations.',
+        '',
+        'Reviewer-approved response',
+        responseForReview(workspace),
+        ''
+      ].join('\n');
+      const url = URL.createObjectURL(new Blob([packet], { type: 'text/plain;charset=utf-8' }));
+      const link = element('a');
+      link.href = url;
+      link.download = 'paycrew-' + caseId + '-evidence.txt';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    query.addEventListener('input', () => renderQueue());
+    filter.addEventListener('change', () => renderQueue());
+    refresh.addEventListener('click', loadCases);
+    addEvidence.addEventListener('click', () => {
+      const workspace = activeWorkspace();
+      if (!workspace || workspace.rows.length >= evidenceLimits.count) return;
+      const row = newEvidence();
+      workspace.rows.push(row);
+      changeEvidence(workspace);
+      renderEvidence(row.key);
+    });
+    generate.addEventListener('click', generateDraft);
+    copyResponse.addEventListener('click', async () => {
+      const workspace = activeWorkspace();
+      const text = workspace?.result?.draft.proposedResponse;
+      if (!text || workspace.pending || draftStaleReason(workspace)) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        workspace.copyStatus = 'Draft copied.';
+      } catch {
+        workspace.copyStatus = 'Clipboard access was unavailable. Select the proposed response to copy it.';
+      }
+      if (activeWorkspace() === workspace) renderDraft();
+    });
+    finalResponse.addEventListener('input', () => {
+      const workspace = activeWorkspace();
+      if (!workspace?.result) return;
+      const { review, result } = workspace;
+      review.response = finalResponse.value === result.draft.proposedResponse ? null : finalResponse.value;
+      if (review.approvedAt) review.message = 'Review cleared. Confirm the updated response.';
+      review.approvedAt = null;
+      renderReview(workspace);
+    });
+    reviewConfirmation.addEventListener('change', () => {
+      const workspace = activeWorkspace();
+      if (!canConfirmReview(workspace)) return;
+      workspace.review.approvedAt = reviewConfirmation.checked ? new Date().toISOString() : null;
+      workspace.review.message = '';
+      renderReview(workspace);
+    });
+    downloadPacket.addEventListener('click', () => {
+      const workspace = activeWorkspace();
+      if (!canConfirmReview(workspace) || !workspace.review.approvedAt) return;
+      exportEvidencePacket(workspace, selectedDispute.dispute_id);
+    });
+
+    message(detailState, 'Select a dispute', 'Case details and response drafting appear here.');
+    loadCases();
+  </script>
+</body>
+</html>
