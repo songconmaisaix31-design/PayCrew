@@ -37,4 +37,4 @@ The configured model receives the dispute reason, status and reviewer-entered ev
 
 The server binds to localhost. Save the downloaded packet to retain a review across sessions.
 
-To record the walkthrough, run **Actions → Record PayCrew demo**. Use `fixture` for a synthetic preview. Use `sandbox` with an item-not-received test dispute and repository secrets `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and `AI_API_KEY`, plus repository variables `AI_BASE_URL` and `AI_MODEL`. The workflow returns the walkthrough video as WebM.
+To record the walkthrough, run **Actions → Record PayCrew demo**. Use `fixture` for a synthetic preview or `fixture-live-ai` to run real AI on synthetic disputes. Live AI uses the `AI_API_KEY` repository secret and the `AI_BASE_URL` and `AI_MODEL` repository variables. The `sandbox` mode also needs `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and an item-not-received test dispute. The workflow returns a WebM video.

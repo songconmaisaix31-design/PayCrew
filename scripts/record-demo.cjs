@@ -8,7 +8,8 @@ const { parseArgs } = require('node:util');
 
 const root = resolve(__dirname, '..');
 const modelSettings = ['AI_BASE_URL', 'AI_API_KEY', 'AI_MODEL'];
-const sandboxSettings = ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', ...modelSettings];
+const sandboxSettings = ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET'];
+const exampleModel = 'Example draft (no model called)';
 const reason = 'MERCHANDISE_OR_SERVICE_NOT_RECEIVED';
 const evidenceLabel = 'Carrier acceptance scan';
 const evidence = 'The carrier accepted the test parcel for shipment on November 4. The scan does not confirm delivery.';
@@ -102,7 +103,7 @@ async function focusView(locator, block = 'center') {
   await locator.hover();
 }
 
-async function capture(page, address, source) {
+async function capture(page, address, { source, liveAI, expectedModel }) {
   const loadQueue = page.waitForResponse(response => response.url() === address + '/api/disputes', { timeout: 28_000 });
   await page.goto(address);
   const { items } = await apiResult(await loadQueue, 'Loading the dispute queue', source);
@@ -115,9 +116,10 @@ async function capture(page, address, source) {
   await page.locator('#detail-body').waitFor({ timeout: 15_000 });
 
   await addRecordingOverlay(page);
-  await caption(page, 'PayCrew · Disputes', source === 'sandbox'
-    ? 'PayPal Sandbox test cases. This walkthrough uses sample evidence.'
-    : 'Synthetic demo data. This walkthrough uses an example draft without a model call.');
+  const opening = source === 'sandbox' ? 'PayPal Sandbox test cases with sample evidence.' : 'Synthetic demo disputes with sample evidence.';
+  await caption(page, 'PayCrew · Disputes', opening + (liveAI
+    ? ' Live AI model · ' + expectedModel + '.'
+    : ' This walkthrough uses an example draft without a model call.'));
   await page.locator('#source').hover();
   await hold(4200);
   await page.locator('#queue-title').hover();
@@ -149,14 +151,14 @@ async function capture(page, address, source) {
 
   const generate = page.getByRole('button', { name: 'Generate draft' });
   await generate.hover();
-  await caption(page, 'Draft a response', source === 'sandbox'
-    ? 'The configured model drafts a response from the case and evidence excerpt.'
+  await caption(page, 'Draft a response', liveAI
+    ? 'The live AI model drafts a response from the case and evidence excerpt.'
     : 'PayCrew builds an example draft from the case and evidence excerpt.');
   await hold(1200);
   const loadDraft = page.waitForResponse(response => response.url() === address + '/api/disputes/' + selected.dispute_id + '/draft', { timeout: 48_000 });
   await generate.click();
   const { draft, model } = await apiResult(await loadDraft, 'Generating the response draft', source);
-  assert.equal(model, source === 'sandbox' ? process.env.AI_MODEL : 'Example draft (no model called)');
+  assert.equal(model, expectedModel);
   assert(draft.citations.includes('E1') && draft.proposedResponse.includes('[E1]'), 'The draft did not cite the supplied excerpt.');
   assert(draft.missingEvidence.length > 0, 'The draft did not identify evidence to verify.');
 
@@ -210,14 +212,22 @@ async function capture(page, address, source) {
 }
 
 async function main() {
-  const { values } = parseArgs({ options: { sandbox: { type: 'boolean' }, output: { type: 'string' } } });
+  const { values } = parseArgs({ options: { sandbox: { type: 'boolean' }, 'live-ai': { type: 'boolean' }, output: { type: 'string' } } });
   const source = values.sandbox ? 'sandbox' : 'fixture';
-  const missing = sandboxSettings.filter(name => !process.env[name]?.trim());
-  if (values.sandbox && missing.length) throw new Error('Sandbox recording requires ' + missing.join(', ') + '.');
+  const liveAI = values.sandbox || values['live-ai'];
+  const requiredSettings = values.sandbox ? [...sandboxSettings, ...modelSettings] : liveAI ? modelSettings : [];
+  const missing = requiredSettings.filter(name => !process.env[name]?.trim());
+  if (missing.length) {
+    const mode = values.sandbox ? 'Sandbox recording' : 'Live AI fixture recording';
+    throw new Error(mode + ' requires ' + missing.join(', ') + '.');
+  }
   const { chromium } = require('playwright');
   const env = { ...process.env, PORT: process.env.PORT || '4173' };
   if (!values.sandbox) {
-    for (const name of [...sandboxSettings, 'OPENAI_API_KEY', 'OPENAI_MODEL']) delete env[name];
+    for (const name of sandboxSettings) delete env[name];
+  }
+  if (!liveAI) {
+    for (const name of [...modelSettings, 'AI_JSON_MODE', 'OPENAI_API_KEY', 'OPENAI_MODEL']) delete env[name];
   }
   const output = resolve(values.output || 'paycrew-demo.webm');
   if (!output.endsWith('.webm')) throw new Error('Choose a .webm output path.');
@@ -230,12 +240,17 @@ async function main() {
     const context = await browser.newContext({ viewport, recordVideo: { dir: temporary, size: viewport } });
     context.setDefaultTimeout(7000);
     const page = await context.newPage();
-    await capture(page, 'http://127.0.0.1:' + env.PORT, source);
+    await capture(page, 'http://127.0.0.1:' + env.PORT, {
+      source,
+      liveAI,
+      expectedModel: liveAI ? env.AI_MODEL : exampleModel
+    });
     const video = page.video();
     await context.close();
     await mkdir(dirname(output), { recursive: true });
     await video.saveAs(output);
-    console.log('Recorded ' + source + ' walkthrough to ' + output);
+    const mode = source === 'fixture' && liveAI ? 'fixture-live-ai' : source;
+    console.log('Recorded ' + mode + ' walkthrough to ' + output);
   } finally {
     await browser?.close();
     server.kill();

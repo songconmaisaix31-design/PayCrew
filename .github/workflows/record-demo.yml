@@ -4,11 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: Data source for the walkthrough
+        description: Demo mode for the walkthrough
         type: choice
         options:
           - sandbox
           - fixture
+          - fixture-live-ai
         default: sandbox
         required: true
 
@@ -39,9 +40,12 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ vars.AI_BASE_URL }}
           AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_JSON_MODE: ${{ vars.AI_JSON_MODE }}
         run: |
           if [[ "$RECORDING_SOURCE" == "sandbox" ]]; then
             node scripts/record-demo.cjs --sandbox
+          elif [[ "$RECORDING_SOURCE" == "fixture-live-ai" ]]; then
+            node scripts/record-demo.cjs --live-ai
           else
             node scripts/record-demo.cjs
           fi
