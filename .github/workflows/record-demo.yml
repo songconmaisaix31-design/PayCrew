@@ -1,0 +1,53 @@
+name: Record PayCrew demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Data source for the walkthrough
+        type: choice
+        options:
+          - sandbox
+          - fixture
+        default: sandbox
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install recording tools
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx --no-install playwright install --with-deps chromium
+          command -v ffmpeg || sudo apt-get install -y ffmpeg
+      - name: Record walkthrough
+        env:
+          RECORDING_SOURCE: ${{ inputs.source }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ vars.AI_BASE_URL }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+        run: |
+          if [[ "$RECORDING_SOURCE" == "sandbox" ]]; then
+            node scripts/record-demo.cjs --sandbox
+          else
+            node scripts/record-demo.cjs
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paycrew-demo-${{ inputs.source }}
+          path: paycrew-demo.mp4
+          if-no-files-found: error
+          retention-days: 7

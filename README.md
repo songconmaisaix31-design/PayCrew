@@ -36,3 +36,5 @@ The configured model receives the dispute reason, status and reviewer-entered ev
 5. Download the evidence packet. It records the case, cited excerpts, draft, gaps, and reviewed response.
 
 The server binds to localhost. Save the downloaded packet to retain a review across sessions.
+
+To record the walkthrough, run **Actions → Record PayCrew demo**. Use `fixture` for a synthetic preview. Use `sandbox` with an item-not-received test dispute and repository secrets `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and `AI_API_KEY`, plus repository variables `AI_BASE_URL` and `AI_MODEL`. The workflow returns the walkthrough MP4.
