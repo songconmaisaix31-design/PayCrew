@@ -875,7 +875,8 @@
 
     function isDirection(line) {
       return /^(?:(?:please|can you|could you|would you|help me)\s+)*(?:draft|write|compose|prepare|summari[sz]e|review|identify|list|find|flag|check|assess|highlight|explain|tell|show|suggest|what|which|where|when|why|how|do i|is|are|revise|rewrite|make|shorten|use|focus)\b/i.test(line) ||
-        line.endsWith('?');
+        /[?？]$|(?:还缺什么|需要哪些|需要什么)(?:证据|材料|记录|证明)?[。！]?$/.test(line) ||
+        /^(?:请|帮我|能否|能不能|麻烦|分析|梳理|总结|核对|检查|起草|写一|改写|润色|列出|找出|还缺|缺什么|需要哪些)/.test(line);
     }
 
     function parseComposer(value) {
@@ -888,8 +889,8 @@
           if (current?.text) current = undefined;
           continue;
         }
-        const explicitDirection = line.match(/^instructions?\s*:\s*(.*)$/i);
-        const labeled = line.match(/^([\p{L}][\p{L}\p{N} &'’/()_-]{0,99}):\s*(.*)$/u);
+        const explicitDirection = line.match(/^(?:instructions?|指令|要求)\s*[:：]\s*(.*)$/i);
+        const labeled = line.match(/^([\p{L}][\p{L}\p{N} &'’/()_-]{0,99})[:：]\s*(.*)$/u);
         if (explicitDirection || (!rows.length && isDirection(labeled?.[1] ?? line))) {
           directions.push(explicitDirection ? explicitDirection[1] : line);
           continue;
@@ -909,6 +910,10 @@
         /\b(evidence|proof|records?|documents?)\b/i.test(instruction) &&
         /^(what|which|how|find|identify|list|flag|show|tell)\b/i.test(instruction) &&
         !/\b(draft|write|compose|prepare|response)\b/i.test(instruction)
+      ) || (
+        /证据|凭证|证明|材料|缺什么/.test(instruction) &&
+        /缺|需要|找|检查|核对|列出|哪些/.test(instruction) &&
+        !/起草|写一|改写|润色|生成.*回复|拟定|修改/.test(instruction)
       );
     }
 
