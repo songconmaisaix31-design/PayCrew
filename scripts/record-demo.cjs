@@ -167,7 +167,7 @@ async function capture(page, address, source) {
   await hold(4700);
 
   await caption(page, 'Edit the response', 'The reviewer can make the shipment wording precise and keep the evidence reference.');
-  const review = page.getByLabel('Final response');
+  const review = page.getByRole('textbox', { name: 'Final response', exact: true });
   const downloadButton = page.getByRole('button', { name: 'Download evidence packet' });
   await focusView(review);
   assert(await downloadButton.isDisabled(), 'The evidence packet can be exported before review.');
