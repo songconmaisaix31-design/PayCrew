@@ -31,7 +31,6 @@ jobs:
         run: |
           npm install --no-save --no-package-lock --fetch-retries=1 playwright@1.56.1
           npx --no-install playwright install --only-shell chromium
-          command -v ffmpeg || sudo apt-get install -y ffmpeg
       - name: Record walkthrough
         env:
           RECORDING_SOURCE: ${{ inputs.source }}
@@ -49,6 +48,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: paycrew-demo-${{ inputs.source }}
-          path: paycrew-demo.mp4
+          path: paycrew-demo.webm
           if-no-files-found: error
           retention-days: 7

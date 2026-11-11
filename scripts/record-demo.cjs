@@ -1,12 +1,11 @@
 const assert = require('node:assert/strict');
-const { execFile, spawn } = require('node:child_process');
+const { spawn } = require('node:child_process');
 const { mkdir, mkdtemp, readFile, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const { dirname, join, resolve } = require('node:path');
 const { setTimeout: hold } = require('node:timers/promises');
-const { parseArgs, promisify } = require('node:util');
+const { parseArgs } = require('node:util');
 
-const run = promisify(execFile);
 const root = resolve(__dirname, '..');
 const modelSettings = ['AI_BASE_URL', 'AI_API_KEY', 'AI_MODEL'];
 const sandboxSettings = ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', ...modelSettings];
@@ -104,7 +103,6 @@ async function focusView(locator, block = 'center') {
 }
 
 async function capture(page, address, source) {
-  const captureStart = performance.now();
   const loadQueue = page.waitForResponse(response => response.url() === address + '/api/disputes', { timeout: 28_000 });
   await page.goto(address);
   const { items } = await apiResult(await loadQueue, 'Loading the dispute queue', source);
@@ -120,7 +118,6 @@ async function capture(page, address, source) {
   await caption(page, 'PayCrew · Disputes', source === 'sandbox'
     ? 'PayPal Sandbox test cases. This walkthrough uses sample evidence.'
     : 'Synthetic demo data. This walkthrough uses an example draft without a model call.');
-  const trim = Math.max(0, (performance.now() - captureStart) / 1000 - 0.2);
   await page.locator('#source').hover();
   await hold(4200);
   await page.locator('#queue-title').hover();
@@ -210,7 +207,6 @@ async function capture(page, address, source) {
   await hold(4400);
   await page.locator('#recording-packet pre').evaluate(element => element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' }));
   await hold(6800);
-  return trim;
 }
 
 async function main() {
@@ -223,8 +219,8 @@ async function main() {
   if (!values.sandbox) {
     for (const name of [...sandboxSettings, 'OPENAI_API_KEY', 'OPENAI_MODEL']) delete env[name];
   }
-  const output = resolve(values.output || 'paycrew-demo.mp4');
-  if (!output.endsWith('.mp4')) throw new Error('Choose an .mp4 output path.');
+  const output = resolve(values.output || 'paycrew-demo.webm');
+  if (!output.endsWith('.webm')) throw new Error('Choose a .webm output path.');
   const temporary = await mkdtemp(join(tmpdir(), 'paycrew-recording-'));
   const server = spawn(process.execPath, ['server.mjs'], { cwd: root, env, stdio: ['ignore', 'pipe', 'ignore'] });
   let browser;
@@ -234,12 +230,11 @@ async function main() {
     const context = await browser.newContext({ viewport, recordVideo: { dir: temporary, size: viewport } });
     context.setDefaultTimeout(7000);
     const page = await context.newPage();
-    const trim = await capture(page, 'http://127.0.0.1:' + env.PORT, source);
+    await capture(page, 'http://127.0.0.1:' + env.PORT, source);
     const video = page.video();
     await context.close();
     await mkdir(dirname(output), { recursive: true });
-    await run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-ss', trim.toFixed(3),
-      '-i', await video.path(), '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', output]);
+    await video.saveAs(output);
     console.log('Recorded ' + source + ' walkthrough to ' + output);
   } finally {
     await browser?.close();
