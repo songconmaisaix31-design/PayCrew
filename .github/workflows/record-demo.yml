@@ -27,9 +27,10 @@ jobs:
         with:
           node-version: 22
       - name: Install recording tools
+        timeout-minutes: 3
         run: |
-          npm install --no-save --no-package-lock playwright@1.56.1
-          npx --no-install playwright install --with-deps chromium
+          npm install --no-save --no-package-lock --fetch-retries=1 playwright@1.56.1
+          npx --no-install playwright install --only-shell chromium
           command -v ffmpeg || sudo apt-get install -y ffmpeg
       - name: Record walkthrough
         env:
