@@ -4,200 +4,121 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#182439">
+  <meta name="theme-color" content="#142c24">
   <title>PayCrew · Disputes</title>
   <style>
     :root {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-      color: #1d2a3c;
-      background: #f5f7fb;
+      color: #192822;
+      background: #f5f6f2;
       font-synthesis: none;
-      --nav: #182439;
+      --ink: #192822;
+      --muted: #52645a;
+      --soft-ink: #64776d;
+      --nav: #142c24;
       --surface: #fff;
-      --muted: #56657b;
-      --subtle: #64748b;
-      --border: #e3e8f1;
-      --accent: #5348b8;
-      --accent-dark: #41379e;
-      --accent-soft: #efedfc;
-      --shadow: 0 2px 4px #1d2a3c06, 0 6px 14px #1d2a3c04;
+      --border: #dce4dd;
+      --accent: #205640;
+      --accent-dark: #174332;
+      --accent-soft: #eaf3eb;
+      --shadow: 0 2px 3px #142c2405, 0 12px 32px #142c2408;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; min-width: 300px; }
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
-    button:disabled { cursor: default; opacity: .65; }
+    button:disabled { cursor: default; opacity: .6; }
     button[aria-busy="true"] { cursor: wait; }
-    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-      outline: 3px solid #9386f6; outline-offset: 2px;
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+      outline: 3px solid #598b6f;
+      outline-offset: 2px;
     }
     button, a { -webkit-tap-highlight-color: transparent; }
-    h1, h2, h3, p, dl, dd { margin: 0; }
+    h1, h2, h3, h4, p, dl, dd { margin: 0; }
     [hidden] { display: none !important; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .icon { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
 
-    .icon {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.65;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .app { display: grid; grid-template-columns: 219px minmax(0, 1fr); min-height: 100vh; }
-    .sidebar {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 27px 16px 18px;
-      background: var(--nav);
-      color: #f7f8fc;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; margin: 0 9px 49px; }
-    .brand-mark {
-      display: grid;
-      place-items: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
-      background: #a99df8;
-      color: #231d59;
-    }
-    .brand-mark .icon { width: 24px; height: 24px; stroke-width: 1.9; }
-    .brand-name { font-size: 21px; font-weight: 730; letter-spacing: -.8px; }
-    .nav-label {
-      margin: 0 10px 10px;
-      font-size: 10px;
-      font-weight: 680;
-      letter-spacing: 1.25px;
-      text-transform: uppercase;
-      color: #aebbd0;
-    }
-    .nav-current {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 12px 11px;
-      border-radius: 8px;
-      color: #f6f5ff;
-      background: #343657;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 620;
-    }
-    .nav-current .icon { color: #c5baff; }
-    .nav-current .nav-indicator { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #b5a8ff; }
-    .sidebar-foot {
-      margin-top: auto;
-      padding: 12px 11px;
-      border: 1px solid #38465c;
-      border-radius: 9px;
-    }
-    .sidebar-foot-title { display: flex; align-items: center; gap: 8px; color: #edf1f8; font-size: 12px; font-weight: 630; }
-    .sidebar-foot-title .icon { color: #b5a8ff; width: 15px; height: 15px; }
-    .sidebar-foot p { margin-top: 5px; color: #aebbd0; font-size: 11px; }
-
-    .main { min-width: 0; }
-    .topbar {
+    .topbar { background: var(--nav); color: #f2f8f2; }
+    .topbar-inner {
+      max-width: 1480px;
       min-height: 66px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 10px clamp(18px, 3.3vw, 46px);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      padding: 10px clamp(18px, 4.4vw, 64px);
+      margin: auto;
     }
-    .breadcrumbs { display: flex; align-items: center; gap: 10px; color: var(--subtle); font-size: 13px; }
-    .breadcrumbs .icon { width: 13px; height: 13px; }
-    .breadcrumbs strong { color: #27344a; font-weight: 650; }
-    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .identity, .brand, .topbar-actions { display: flex; align-items: center; }
+    .identity { gap: 18px; }
+    .brand { gap: 9px; color: inherit; text-decoration: none; font-size: 22px; font-weight: 760; letter-spacing: -.75px; }
+    .brand-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: #d1ecd5; color: #153b2c; }
+    .brand-mark .icon { width: 22px; height: 22px; stroke-width: 1.9; }
+    .nav-current { color: #d0ddd3; border-left: 1px solid #52675c; padding-left: 18px; font-size: 13px; font-weight: 530; }
+    .topbar-actions { gap: 9px; }
+    .topbar .button { background: #294337; border-color: #496355; color: #f2f8f2; }
+    .topbar .button:hover:not(:disabled) { background: #385a49; border-color: #6d8f7b; }
     .source {
       min-height: 28px;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 7px;
       border-radius: 999px;
-      background: #edf0f5;
-      color: #495970;
+      background: #dbe6dd;
+      color: #345046;
       padding: 4px 10px;
       font-size: 11px;
       font-weight: 700;
       white-space: nowrap;
     }
     .source::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-    .source-fixture { background: #fff0d8; color: #82500d; }
-    .source-sandbox { background: #e2f5ee; color: #22694f; }
+    .source-fixture { background: #f5e9c8; color: #6b4a18; }
+    .source-sandbox { background: #d8efdf; color: #215b41; }
     .button {
-      min-height: 37px;
+      min-height: 36px;
       display: inline-flex;
       justify-content: center;
       align-items: center;
       gap: 7px;
-      padding: 7px 12px;
-      color: #38445a;
-      border: 1px solid #dce3ee;
+      padding: 7px 11px;
+      color: #31493d;
+      border: 1px solid #d5e0d7;
       background: var(--surface);
       border-radius: 8px;
       font-size: 12px;
-      font-weight: 660;
-      white-space: nowrap;
+      font-weight: 680;
     }
     .button .icon { width: 15px; height: 15px; }
-    .button:hover:not(:disabled) { background: #f5f6fd; border-color: #cbc6ef; }
+    .button:hover:not(:disabled) { background: #f0f6ef; border-color: #adc4b1; }
     .button-primary { color: #fff; background: var(--accent); border-color: var(--accent); }
     .button-primary:hover:not(:disabled) { color: #fff; background: var(--accent-dark); border-color: var(--accent-dark); }
-    .button-link { color: var(--accent-dark); background: transparent; border: 1px solid transparent; padding-inline: 6px; }
-    .button-link:hover:not(:disabled) { border-color: #e2dff8; }
+    .button-link { color: var(--accent-dark); background: transparent; border-color: transparent; }
+    .button-link:hover:not(:disabled) { border-color: var(--border); }
 
-    .workspace { max-width: 1530px; margin: auto; padding: 31px clamp(18px, 3.3vw, 46px) 42px; }
-    .page-title { font-size: clamp(29px, 3vw, 39px); font-weight: 740; letter-spacing: -1.6px; line-height: 1.1; }
-    .page-description { color: var(--muted); font-size: 14px; margin-top: 9px; line-height: 1.5; }
-    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin: 23px 0; }
-    .stat {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-    }
-    .stat-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; flex: 0 0 auto; }
-    .stat-icon.violet { background: #efedfc; color: #5549b5; }
-    .stat-icon.amber { background: #fff3de; color: #865415; }
-    .stat-icon.green { background: #e5f5ee; color: #22694f; }
-    .stat-label { color: var(--muted); font-size: 11px; line-height: 1.2; }
-    .stat-value { margin-top: 4px; font-size: 22px; font-weight: 700; letter-spacing: -.5px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-
-    .panes { display: grid; grid-template-columns: minmax(265px, .8fr) minmax(0, 1.25fr); align-items: start; gap: 18px; }
-    .card { min-width: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
-    .queue-top { padding: 17px 17px 13px; border-bottom: 1px solid var(--border); }
+    .workspace { max-width: 1480px; margin: auto; padding: 33px clamp(18px, 4.4vw, 64px) 42px; }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 23px; }
+    .page-title { font-size: clamp(33px, 3vw, 44px); font-weight: 755; letter-spacing: -.05em; line-height: 1.05; }
+    .page-description { color: var(--muted); font-size: 14px; margin-top: 8px; line-height: 1.55; }
+    .stats { display: flex; align-items: center; flex-wrap: wrap; gap: 7px 15px; color: var(--muted); font-size: 12px; }
+    .stat { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+    .stat + .stat { border-left: 1px solid #cfdacf; padding-left: 15px; }
+    .stat-value { color: var(--ink); font-weight: 750; font-variant-numeric: tabular-nums; }
+    .panes { display: grid; grid-template-columns: minmax(278px, .8fr) minmax(0, 2.04fr); align-items: start; gap: 19px; }
+    .card { min-width: 0; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+    .queue-top { padding: 17px 15px 13px; border-bottom: 1px solid var(--border); }
     .queue-title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .queue-title h2, .section-title { font-size: 16px; font-weight: 720; letter-spacing: -.25px; }
-    .count { background: #f0f2f7; border-radius: 999px; padding: 2px 7px; color: #536279; font-size: 11px; font-weight: 690; }
-    .search-row { display: flex; gap: 7px; }
+    .queue-title h2, .section-title { font-size: 16px; font-weight: 730; letter-spacing: -.25px; }
+    .count { background: #edf2ed; border-radius: 999px; padding: 2px 7px; color: #415d4e; font-size: 11px; font-weight: 700; }
+    .search-row { display: flex; gap: 6px; }
     .search-field { position: relative; flex: 1; min-width: 0; }
-    .search-field .icon { position: absolute; left: 9px; top: 9px; color: #63738b; width: 15px; height: 15px; pointer-events: none; }
-    input, textarea, select {
-      color: #29364c;
-      background: #fff;
-      border: 1px solid #dce3ee;
-      border-radius: 7px;
-      min-width: 0;
-      font-size: 12px;
-    }
-    input::placeholder, textarea::placeholder { color: #64738a; opacity: 1; }
-    .search-field input { width: 100%; min-height: 34px; padding: 6px 8px 6px 29px; }
-    .search-row select { width: 99px; min-height: 34px; padding: 5px 4px 5px 7px; font-size: 11px; }
-    .queue-list { display: grid; gap: 3px; padding: 7px; max-height: min(620px, 66vh); overflow: auto; }
+    .search-field .icon { position: absolute; left: 9px; top: 10px; color: var(--soft-ink); width: 15px; height: 15px; pointer-events: none; }
+    input, textarea, select { color: var(--ink); background: #fff; border: 1px solid #d5dfd6; border-radius: 7px; min-width: 0; font-size: 13px; }
+    input::placeholder, textarea::placeholder { color: #687c70; opacity: 1; }
+    .search-field input { width: 100%; min-height: 35px; padding: 6px 7px 6px 29px; font-size: 12px; }
+    .search-row select { width: 105px; min-height: 35px; padding: 5px 4px 5px 7px; font-size: 11px; }
+    .queue-list { display: grid; gap: 3px; padding: 7px; max-height: min(620px, 65vh); overflow: auto; }
     .case-row {
       position: relative;
       min-width: 0;
@@ -205,148 +126,140 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       text-align: left;
-      gap: 4px 8px;
-      padding: 11px 10px 11px 13px;
+      gap: 7px 8px;
+      padding: 12px 10px 12px 13px;
       border: 1px solid transparent;
       border-radius: 8px;
       background: transparent;
       color: inherit;
     }
-    .case-row:hover { background: #f7f8fb; }
-    .case-row[aria-pressed="true"] { background: #f3f1ff; border-color: #e2ddff; }
-    .case-row[aria-pressed="true"]::before { content: ""; position: absolute; left: 0; top: 11px; bottom: 11px; width: 3px; border-radius: 0 3px 3px 0; background: #7567d3; }
-    .case-name { color: #26334b; font-size: 13px; font-weight: 700; min-width: 0; }
-    .case-id { color: #586a83; font-size: 11px; overflow-wrap: anywhere; align-self: center; }
-    .case-amount { color: #27344a; justify-self: end; font-size: 13px; font-weight: 720; text-align: right; font-variant-numeric: tabular-nums; }
-    .status {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      padding: 3px 7px;
-      border-radius: 999px;
-      color: #4e5d73;
-      background: #eef1f6;
-      font-size: 10px;
-      font-weight: 690;
-      line-height: 1.3;
-    }
+    .case-row:hover { background: #f5f8f3; }
+    .case-row[aria-pressed="true"] { background: #eaf3eb; border-color: #d4e5d7; }
+    .case-row[aria-pressed="true"]::before { content: ""; position: absolute; left: 0; top: 11px; bottom: 11px; width: 3px; border-radius: 0 3px 3px 0; background: #4d8567; }
+    .case-name { color: var(--ink); font-size: 13px; font-weight: 730; min-width: 0; overflow-wrap: anywhere; }
+    .case-id, .detail-id { color: var(--muted); font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; align-self: center; }
+    .case-amount { color: #24392f; justify-self: end; font-size: 12px; font-weight: 730; text-align: right; font-variant-numeric: tabular-nums; }
+    .status { display: inline-flex; align-items: center; width: fit-content; padding: 3px 7px; border-radius: 999px; color: #455a50; background: #edf1ed; font-size: 10px; font-weight: 700; line-height: 1.3; }
     .case-row .status { justify-self: end; text-align: right; }
-    .status.response { color: #865016; background: #fff0d6; }
-    .status.review { color: #4b40a6; background: #eae7fa; }
+    .status.response { color: #714a13; background: #f9efd7; }
+    .status.review { color: #4b4776; background: #eceaf7; }
     .status.resolved { color: #22694f; background: #e3f4eb; }
-    .status.open { color: #335f8b; background: #e7f0fb; }
-    .queue-foot { border-top: 1px solid var(--border); padding: 10px 17px; font-size: 11px; color: var(--subtle); }
+    .status.open { color: #305c77; background: #e7f1f7; }
+    .queue-foot { border-top: 1px solid var(--border); padding: 10px 15px; font-size: 11px; color: var(--muted); }
 
-    .detail { padding: 17px 19px 19px; }
+    .detail { padding: clamp(16px, 2.2vw, 26px); }
     .detail-heading { display: flex; align-items: flex-start; gap: 10px; justify-content: space-between; }
-    .detail-heading .status { margin-top: 3px; font-size: 11px; text-align: right; }
-    .detail-title { font-size: 21px; font-weight: 735; letter-spacing: -.55px; overflow-wrap: anywhere; }
-    .detail-id { margin-top: 4px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
-    .detail-meta {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin: 14px 0 16px;
-      padding: 10px 12px;
-      border: 1px solid #e8ecf3;
-      border-radius: 8px;
-      background: #f8f9fc;
-    }
-    .detail-meta dt { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; color: var(--muted); font-size: 11px; }
-    .detail-meta .icon { width: 13px; height: 13px; }
-    .detail-meta dd { color: #27344a; font-size: 13px; font-weight: 690; overflow-wrap: anywhere; }
+    .detail-heading .status { margin-top: 2px; padding: 5px 9px; font-size: 11px; text-align: right; }
+    .detail-title { font-size: clamp(23px, 2.55vw, 32px); line-height: 1.12; font-weight: 750; letter-spacing: -.045em; overflow-wrap: anywhere; }
+    .detail-id { margin-top: 6px; }
+    .detail-meta { display: flex; flex-wrap: wrap; gap: 10px 25px; margin: 15px 0 17px; padding: 10px 0 0; border-top: 1px solid #e8eee8; }
+    .detail-meta > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 7px; }
+    .detail-meta dt { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; }
+    .detail-meta .icon { width: 15px; height: 15px; }
+    .detail-meta dd { color: #253e32; font-size: 12px; font-weight: 730; overflow-wrap: anywhere; }
     .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .section-description { color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .evidence-rows { display: grid; gap: 11px; margin: 10px 0 15px; }
-    .evidence-row { display: grid; grid-template-columns: minmax(0, 1fr) 30px; gap: 5px 6px; }
-    .evidence-row label { display: block; margin-bottom: 4px; color: #45536a; font-size: 11px; font-weight: 650; }
+
+    .composer-panel { padding: clamp(13px, 2vw, 20px); border: 1px solid #dce8db; border-radius: 12px; background: #f2f7ef; }
+    .assistant-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .assistant-mark { display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; border: 1px solid #c4dac6; border-radius: 10px; background: #e2efe2; color: #205640; }
+    .assistant-mark .icon { width: 21px; height: 21px; }
+    .assistant-heading h3 { color: #1c3a2c; font-size: 16px; font-weight: 750; letter-spacing: -.25px; }
+    .assistant-heading p { margin-top: 2px; }
+    .composer-box { border: 1px solid #bdcfc1; border-radius: 11px; background: #fff; box-shadow: 0 2px 6px #163c2810; }
+    .composer-box:focus-within { border-color: #68937a; }
+    #composer { display: block; width: 100%; min-height: 87px; resize: vertical; padding: 13px 13px 6px; border: 0; border-radius: 11px; font-size: 14px; line-height: 1.55; }
+    #composer:focus-visible { outline-offset: -3px; }
+    .composer-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 6px 8px 8px; }
+    .composer-actions .button-primary { min-height: 37px; padding-inline: 12px; white-space: nowrap; }
+    .compose-format { margin: 7px 2px 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .composer-suggestions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .suggestion { min-height: 30px; padding: 4px 8px; background: #fbfdf9; font-size: 11px; }
+    .suggestion .icon { width: 13px; height: 13px; }
+    .assist-note { display: flex; align-items: center; gap: 6px; margin: 11px 2px 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .assist-note .icon { width: 14px; height: 14px; }
+    .evidence-editor { margin-top: 11px; padding: 9px 11px 10px; border: 1px solid #dae5da; border-radius: 8px; background: #fbfdfa; }
+    .evidence-rows { display: grid; gap: 10px; margin: 6px 0 2px; }
+    .evidence-row { display: grid; grid-template-columns: minmax(0, 1fr) 32px; gap: 5px 6px; }
+    .evidence-row label { display: block; margin-bottom: 4px; color: #43594d; font-size: 12px; font-weight: 660; }
     .evidence-row input, .evidence-row textarea { display: block; width: 100%; padding: 7px 9px; line-height: 1.4; }
     .evidence-text { grid-column: 1 / -1; }
     .evidence-row textarea { min-height: 56px; resize: vertical; }
-    .icon-button { align-self: end; width: 30px; min-height: 32px; padding: 0; }
-    .icon-button .icon { width: 14px; height: 14px; }
-    .draft-panel {
-      margin-top: 7px;
-      padding: 12px 13px;
-      border: 1px solid #e6e1fb;
-      border-radius: 9px;
-      background: #f9f7ff;
-    }
-    .draft-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .draft-label { display: flex; gap: 8px; align-items: center; color: #41368d; font-size: 14px; font-weight: 720; }
-    .draft-label .icon { width: 16px; height: 16px; }
-    .draft-description { margin-top: 3px; color: #5b5479; font-size: 11px; line-height: 1.5; }
-    .draft-output { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e6e1fb; }
-    .draft-output h3 { color: #343051; font-size: 12px; margin-bottom: 5px; }
-    .draft-output p, .draft-output ul { color: #4c466b; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    .icon-button { align-self: end; width: 32px; min-height: 34px; padding: 0; }
+
+    .draft-message { margin-top: 10px; color: #395549; font-size: 12px; line-height: 1.5; }
+    .draft-message.error, .evidence-error { color: #8f3733; }
+    .evidence-error { margin: 7px 0 2px; font-size: 12px; line-height: 1.5; }
+    .draft-output { margin-top: 18px; padding: clamp(13px, 2vw, 20px); border: 1px solid #dce6db; border-radius: 12px; background: #fcfdfb; scroll-margin-top: 15px; }
+    .draft-output:focus { outline: none; }
+    .draft-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #e1e9e0; }
+    .draft-label { color: #203a2d; font-size: 18px; font-weight: 750; letter-spacing: -.35px; }
+    .draft-output p, .draft-output ul { color: #43564c; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+    .draft-output h4 { margin-bottom: 5px; color: #253e32; font-size: 13px; font-weight: 740; }
     .draft-output ul { padding-left: 17px; margin: 0; }
     .draft-output li + li { margin-top: 4px; }
     .draft-output section + section { margin-top: 12px; }
-    .draft-output .response-text { margin: 0; padding: 9px 10px; background: #fff; border: 1px solid #e7e3f7; border-radius: 7px; white-space: pre-wrap; }
-    .draft-output .section-heading { margin-bottom: 3px; }
-    .draft-output .section-heading h3 { margin-bottom: 0; }
-    .draft-output .section-heading .button { min-height: 28px; padding-block: 3px; }
-    .draft-output .model-note { margin-top: 12px; color: var(--subtle); font-size: 11px; }
-    .draft-message { margin-top: 7px; color: #5b5479; font-size: 11px; line-height: 1.5; }
-    .draft-message.error, .evidence-error { color: #963d3d; }
-    .evidence-error { margin: -5px 0 10px; font-size: 12px; line-height: 1.5; }
-    .review-panel { margin-top: 13px; padding-top: 12px; border-top: 1px solid #e6e1fb; }
-    .review-panel label { display: block; margin-top: 9px; color: #45536a; font-size: 12px; font-weight: 650; }
-    .review-panel textarea { display: block; width: 100%; min-height: 116px; margin-top: 5px; padding: 8px 10px; line-height: 1.55; resize: vertical; }
-    .review-panel .review-confirmation { display: flex; align-items: flex-start; gap: 7px; font-weight: 500; line-height: 1.5; }
-    .review-confirmation input { margin: 2px 0 0; accent-color: var(--accent); }
-    .review-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px 10px; margin-top: 10px; }
-
+    .draft-output .model-note { padding: 3px 7px; border-radius: 5px; background: #edf2ed; color: #445b4e; font-size: 11px; }
+    .draft-insights { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 13px; margin: 12px 0 14px; }
+    .draft-insights section + section { margin: 0; }
+    .draft-insights section { padding: 10px 11px; border: 1px solid #e1e9e0; border-radius: 8px; background: #f5f8f3; }
+    .draft-insights .missing-panel { border-color: #eee5cd; background: #fbf8ed; }
+    .draft-insights h4 { display: flex; align-items: center; gap: 6px; }
+    .draft-insights .icon { width: 14px; height: 14px; }
+    .review-panel label { display: block; color: #354d40; font-size: 13px; font-weight: 700; }
+    .review-panel textarea { display: block; width: 100%; min-height: 112px; margin-top: 6px; padding: 9px 10px; line-height: 1.55; resize: vertical; }
+    .draft-original { margin: 8px 0 14px; color: var(--accent-dark); font-size: 12px; }
+    .draft-original summary { width: fit-content; cursor: pointer; font-weight: 670; }
+    .draft-output .response-text { margin-top: 6px; padding: 9px 10px; background: #fff; border: 1px solid #e1e9e0; border-radius: 7px; white-space: pre-wrap; }
+    .draft-original .button { margin-top: 5px; }
+    #draft-citations { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+    .cite {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      padding: 2px 5px;
+      border: 1px solid #cbdcce;
+      border-radius: 5px;
+      background: #edf4ec;
+      color: #254d39;
+      font: 650 11px ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    a.cite:hover { background: #d8ebdc; }
+    #draft-evidence { display: grid; gap: 6px; }
+    .source-excerpt { scroll-margin-top: 14px; padding: 8px 9px; border: 1px solid #e0e8df; border-radius: 7px; background: #fff; }
+    .source-excerpt:target, .source-excerpt:focus { border-color: #68937a; outline: 2px solid #8cb39b; }
+    .source-excerpt h5 { display: flex; align-items: center; gap: 7px; margin: 0 0 4px; color: #2e4739; font-size: 12px; }
+    .source-excerpt p { white-space: pre-wrap; }
+    .review-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px 10px; margin-top: 9px; }
+    #guidance-next { margin-top: 8px; color: var(--accent-dark); }
     .message { padding: 28px 12px; text-align: center; color: var(--muted); }
-    .message .message-icon { display: grid; place-items: center; margin: 0 auto 8px; width: 34px; height: 34px; border-radius: 8px; color: #6055ad; background: #f0eefb; }
+    .message .message-icon { display: grid; place-items: center; margin: 0 auto 8px; width: 34px; height: 34px; border-radius: 8px; color: #28583f; background: #eaf3e9; }
     .message .message-icon .icon { width: 16px; height: 16px; }
-    .message h3 { font-size: 13px; font-weight: 720; color: #2d394e; }
+    .message h3 { font-size: 14px; font-weight: 730; color: var(--ink); }
     .message p { margin-top: 5px; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
     .message button { margin-top: 9px; }
     .detail-placeholder { min-height: 220px; display: grid; place-items: center; }
-    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-    @media (max-width: 1120px) {
-      .app { grid-template-columns: 175px minmax(0, 1fr); }
-      .sidebar { padding-inline: 12px; }
+    @media (max-width: 900px) {
+      .panes { grid-template-columns: minmax(248px, .85fr) minmax(0, 1.75fr); gap: 13px; }
+      .detail-meta { gap: 6px 14px; }
+      .search-row select { width: 92px; }
     }
-    @media (max-width: 930px) {
-      .app { grid-template-columns: 70px minmax(0, 1fr); }
-      .sidebar { padding-inline: 12px; align-items: center; }
-      .brand { margin: 0 0 31px; }
-      .brand-name, .nav-label, .nav-text, .nav-current .nav-indicator, .sidebar-foot p, .sidebar-foot-title span { display: none; }
-      .nav-current, .sidebar-foot { padding: 10px; }
-      .sidebar-foot-title .icon { width: 18px; height: 18px; }
-    }
-    @media (max-width: 710px) {
-      .app { display: block; }
-      .sidebar { position: static; height: auto; flex-direction: row; justify-content: space-between; padding: 10px 16px; }
-      .brand { margin: 0; }
-      .brand-name { display: block; font-size: 18px; }
-      .brand-mark { width: 30px; height: 30px; border-radius: 8px; }
-      .brand-mark .icon { width: 20px; height: 20px; }
-      .sidebar-foot { display: none; }
-      .nav-current { padding: 7px 9px; font-size: 12px; }
-      .nav-current .icon { width: 15px; height: 15px; }
-      .nav-text { display: inline; }
-      .topbar { min-height: 52px; }
-      .workspace { padding-top: 24px; }
+    @media (max-width: 690px) {
+      .workspace { padding-top: 23px; }
+      .topbar-inner { min-height: 54px; }
+      .page-heading { align-items: flex-start; flex-direction: column; gap: 10px; margin-bottom: 17px; }
       .panes { grid-template-columns: minmax(0, 1fr); }
-      .queue-list { max-height: 310px; }
-      .stats { gap: 6px; margin-block: 16px; }
-      .stat { gap: 5px; padding: 8px 6px; }
-      .stat-icon { width: 24px; height: 24px; border-radius: 6px; }
-      .stat-icon .icon { width: 13px; height: 13px; }
-      .stat-label { font-size: 10px; }
-      .stat-value { font-size: 16px; }
+      .queue-list { max-height: 185px; }
     }
-    @media (max-width: 380px) {
-      .breadcrumbs { gap: 4px; font-size: 11px; }
-      .topbar, .workspace { padding-inline: 11px; }
-      .topbar-actions { gap: 5px; }
-      .refresh-label { display: none; }
-      .draft-head { align-items: stretch; flex-direction: column; }
-      .draft-head .button { align-self: start; }
+    @media (max-width: 430px) {
+      .nav-current, .refresh-label { display: none; }
+      .topbar-inner, .workspace { padding-inline: 12px; }
+      .stat + .stat { padding-left: 8px; }
+      .stats { column-gap: 8px; }
+      .draft-insights { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+      .detail-heading .status { max-width: 112px; }
     }
     @media (prefers-reduced-motion: no-preference) {
       .button, .case-row { transition: background-color .14s ease, border-color .14s ease; }
@@ -369,33 +282,23 @@
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M9 7V4.5h6V7m2.5 0-.9 12h-9l-.9-12M10 10v5.5m4-5.5v5.5"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M10 3.5 11.7 9l5.3 1.8-5.3 1.7L10 18l-1.8-5.5L3 10.8 8.2 9zM18 13l1.1 3 2.9 1-2.9 1-1.1 3-1-3-3-1 3-1z"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M6 16H5V5h11v1"/></symbol>
+
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m9 12.8 5-5a2.4 2.4 0 0 1 3.4 3.4L11.5 17a4 4 0 0 1-5.7-5.7l6.4-6.4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><rect x="5.5" y="4" width="13" height="16" rx="2"/><path d="M9 9h6m-6 4h6m-6 4h3"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4-4 4 4 4-4M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></symbol>
   </svg>
 
-  <div class="app">
-    <aside class="sidebar" aria-label="PayCrew navigation">
-      <div class="brand">
-        <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-brand"/></svg></span>
-        <span class="brand-name">PayCrew</span>
-      </div>
-      <nav>
-        <div class="nav-label">Workspace</div>
-        <a class="nav-current" href="#disputes" aria-current="page" aria-label="Disputes">
-          <svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg>
-          <span class="nav-text">Disputes</span><span class="nav-indicator" aria-hidden="true"></span>
-        </a>
-      </nav>
-      <div class="sidebar-foot">
-        <div class="sidebar-foot-title">
-          <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg><span>Read-only PayPal access</span>
-        </div>
-        <p>Merchant workspace</p>
-      </div>
-    </aside>
 
-    <main class="main" id="disputes">
-      <header class="topbar">
-        <div class="breadcrumbs">
-          <span>Workspace</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><strong>Disputes</strong>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="identity">
+          <a class="brand" href="#disputes">
+            <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-brand"/></svg></span>
+            PayCrew
+          </a>
+          <span class="nav-current">Merchant workspace</span>
         </div>
         <div class="topbar-actions">
           <span class="source" id="source" role="status">Connecting</span>
@@ -403,140 +306,166 @@
             <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><span class="refresh-label">Refresh</span>
           </button>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <div class="workspace">
-        <h1 class="page-title">Disputes</h1>
-        <p class="page-description">Review PayPal cases, organize evidence, and prepare a response.</p>
-
-        <div class="stats" role="group" aria-label="Loaded dispute totals">
-          <div class="stat">
-            <span class="stat-icon violet"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg></span>
-            <dl><dt class="stat-label">Cases loaded</dt><dd class="stat-value" id="stat-total">—</dd></dl>
-          </div>
-          <div class="stat">
-            <span class="stat-icon amber"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></span>
-            <dl><dt class="stat-label">Needs seller response</dt><dd class="stat-value" id="stat-response">—</dd></dl>
-          </div>
-          <div class="stat">
-            <span class="stat-icon green"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>
-            <dl><dt class="stat-label">Resolved</dt><dd class="stat-value" id="stat-resolved">—</dd></dl>
-          </div>
+    <main class="workspace" id="disputes">
+      <div class="page-heading">
+        <div>
+          <h1 class="page-title">Disputes</h1>
+          <p class="page-description">Prepare and review responses to PayPal disputes.</p>
         </div>
+        <div class="stats" role="group" aria-label="Loaded dispute totals">
+          <p class="stat"><span class="stat-value" id="stat-total">—</span> cases loaded</p>
+          <p class="stat"><span class="stat-value" id="stat-response">—</span> need a response</p>
+          <p class="stat"><span class="stat-value" id="stat-resolved">—</span> resolved</p>
+        </div>
+      </div>
 
-        <div class="panes">
-          <section class="card queue" aria-labelledby="queue-title">
-            <div class="queue-top">
-              <div class="queue-title">
-                <h2 id="queue-title">Case queue</h2><span class="count" id="visible-count" hidden></span>
-              </div>
-              <div class="search-row">
-                <label class="search-field">
-                  <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
-                  <span class="visually-hidden">Search cases</span>
-                  <input id="query" type="search" placeholder="Search ID or reason">
-                </label>
-                <label>
-                  <span class="visually-hidden">Filter cases by status</span>
-                  <select id="filter">
-                    <option value="">All statuses</option>
-                    <option value="response">Needs response</option>
-                    <option value="review">Under review</option>
-                    <option value="open">Open</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </label>
-              </div>
+      <div class="panes">
+        <section class="card queue" aria-labelledby="queue-title">
+          <div class="queue-top">
+            <div class="queue-title">
+              <h2 id="queue-title">Case queue</h2><span class="count" id="visible-count" hidden></span>
             </div>
-            <div class="queue-list" id="queue" aria-live="polite"></div>
-            <p class="queue-foot" id="queue-foot" hidden></p>
-          </section>
+            <div class="search-row">
+              <label class="search-field">
+                <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+                <span class="visually-hidden">Search cases</span>
+                <input id="query" type="search" placeholder="Search ID or reason">
+              </label>
+              <label>
+                <span class="visually-hidden">Filter cases by status</span>
+                <select id="filter">
+                  <option value="">All statuses</option>
+                  <option value="response">Needs response</option>
+                  <option value="review">Under review</option>
+                  <option value="open">Open</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="queue-list" id="queue" aria-live="polite"></div>
+          <p class="queue-foot" id="queue-foot" hidden></p>
+        </section>
 
-          <section class="card detail" id="detail" aria-label="Dispute details">
-            <div class="detail-placeholder" id="detail-state" aria-live="polite"></div>
-            <div id="detail-body" hidden>
-              <div class="detail-heading">
-                <div>
-                  <h2 class="detail-title" id="detail-title"></h2>
-                  <p class="detail-id" id="detail-id"></p>
-                </div>
-                <span class="status" id="detail-status"></span>
+        <section class="card detail" id="detail" aria-label="Selected dispute">
+          <div class="detail-placeholder" id="detail-state" aria-live="polite"></div>
+          <div id="detail-body" hidden>
+            <div class="detail-heading">
+              <div>
+                <h2 class="detail-title" id="detail-title"></h2>
+                <p class="detail-id" id="detail-id"></p>
               </div>
-              <dl class="detail-meta">
-                <div>
-                  <dt><svg class="icon" aria-hidden="true"><use href="#i-cash"/></svg>Disputed amount</dt>
-                  <dd id="detail-amount"></dd>
-                </div>
-                <div>
-                  <dt><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>Seller response due</dt>
-                  <dd id="detail-due"></dd>
-                </div>
-              </dl>
+              <span class="status" id="detail-status"></span>
+            </div>
+            <dl class="detail-meta">
+              <div>
+                <dt><svg class="icon" aria-hidden="true"><use href="#i-cash"/></svg>Disputed amount</dt>
+                <dd id="detail-amount"></dd>
+              </div>
+              <div>
+                <dt><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>Seller response due</dt>
+                <dd id="detail-due"></dd>
+              </div>
+            </dl>
 
-              <section aria-labelledby="evidence-title">
+            <form class="composer-panel" id="compose-form" aria-labelledby="compose-title">
+              <div class="assistant-heading">
+                <span class="assistant-mark"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg></span>
+                <div>
+                  <h3 id="compose-title">PayCrew Assistant</h3>
+                  <p class="section-description" id="compose-help">Ask what proof you need, or paste your evidence to draft a response with citations.</p>
+                </div>
+              </div>
+              <div class="composer-box">
+                <label class="visually-hidden" for="composer">Instructions and evidence</label>
+                <textarea id="composer" rows="4" spellcheck="true" aria-describedby="compose-help compose-format composer-note" placeholder="What evidence should I gather for this dispute?"></textarea>
+                <div class="composer-actions">
+                  <button class="button button-link" id="show-evidence" type="button" aria-expanded="false" aria-controls="evidence-editor">
+                    <svg class="icon" aria-hidden="true"><use href="#i-clip"/></svg><span id="evidence-toggle-label">Add labeled evidence</span>
+                  </button>
+                  <button class="button button-primary" id="generate" type="submit">
+                    <span id="generate-label">Draft response</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="compose-format" id="compose-format">Put directions on their own line when pasting evidence.</p>
+
+              <section class="evidence-editor" id="evidence-editor" aria-labelledby="evidence-title" hidden>
                 <div class="section-heading">
-                  <h3 class="section-title" id="evidence-title">Evidence</h3>
+                  <h4 class="section-title" id="evidence-title">Labeled evidence</h4>
                   <button class="button button-link" id="add-evidence" type="button">
                     <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Add evidence
                   </button>
                 </div>
-                <p class="section-description">Add 1–8 evidence excerpts, such as delivery confirmation or customer messages. Omit personal data and credentials.</p>
                 <div class="evidence-rows" id="evidence-rows"></div>
-                <p class="evidence-error" id="evidence-error" role="alert" hidden></p>
               </section>
+              <p class="evidence-error" id="evidence-error" role="alert" hidden></p>
 
-              <section class="draft-panel" aria-labelledby="draft-title">
-                <div class="draft-head">
-                  <div>
-                    <h3 class="draft-label" id="draft-title"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg>AI response draft</h3>
-                    <p class="draft-description">For human review. Verify the draft and citations before using the response.</p>
-                  </div>
-                  <button class="button button-primary" id="generate" type="button">
-                    <svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg><span id="generate-label">Generate draft</span>
+              <div class="composer-suggestions">
+                <button class="button suggestion" id="find-proof" type="button">
+                  <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>Find missing evidence
+                </button>
+                <button class="button suggestion" id="try-example" type="button" hidden>
+                  <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>Try sample evidence
+                </button>
+              </div>
+              <p class="draft-message" id="draft-message" role="status" hidden></p>
+            </form>
+            <p class="assist-note" id="composer-note">
+              <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
+              PayPal access is read-only. Omit personal data and credentials from evidence.
+            </p>
+
+            <section class="draft-output" id="draft-output" aria-labelledby="draft-title" tabindex="-1" hidden>
+              <div class="draft-head">
+                <h3 class="draft-label" id="draft-title">Response draft</h3>
+                <p class="model-note" id="draft-model" hidden></p>
+              </div>
+              <div class="draft-insights">
+                <section>
+                  <h4>Case summary</h4>
+                  <p id="draft-summary"></p>
+                </section>
+                <section class="missing-panel">
+                  <h4><svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>Missing evidence</h4>
+                  <div id="draft-missing"></div>
+                </section>
+              </div>
+              <p id="guidance-next" hidden>Add the records you have to draft a response with citations.</p>
+
+              <div class="review-panel" id="review-panel" hidden>
+                <div class="section-heading">
+                  <label for="final-response">Final response</label>
+                  <button class="button button-link" id="restore-edit" type="button" hidden>Restore previous edit</button>
+                </div>
+                <textarea id="final-response" rows="5"></textarea>
+                <details class="draft-original" id="draft-original">
+                  <summary>View original draft</summary>
+                  <p class="response-text" id="draft-response"></p>
+                  <button class="button" id="copy-response" type="button">
+                    <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span id="copy-label">Copy draft</span>
                   </button>
+                </details>
+                <section aria-labelledby="citations-title">
+                  <div class="section-heading">
+                    <h4 id="citations-title">Source excerpts</h4>
+                    <div id="draft-citations" aria-label="Cited sources"></div>
+                  </div>
+                  <div id="draft-evidence"></div>
+                </section>
+                <div class="review-actions">
+                  <button class="button button-primary" id="download-packet" type="button" disabled>
+                    <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>Approve &amp; download
+                  </button>
+                  <p id="review-message" role="status"></p>
                 </div>
-                <p class="draft-message" id="draft-message" role="status" hidden></p>
-                <div class="draft-output" id="draft-output" hidden>
-                  <section>
-                    <h3>Case summary</h3>
-                    <p id="draft-summary"></p>
-                  </section>
-                  <section>
-                    <h3>Missing evidence</h3>
-                    <div id="draft-missing"></div>
-                  </section>
-                  <section>
-                    <div class="section-heading">
-                      <h3>Proposed response</h3>
-                      <button class="button" id="copy-response" type="button">
-                        <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span id="copy-label">Copy draft</span>
-                      </button>
-                    </div>
-                    <p class="response-text" id="draft-response"></p>
-                  </section>
-                  <section>
-                    <h3>Citations</h3>
-                    <div id="draft-citations"></div>
-                  </section>
-                  <p class="model-note" id="draft-model" hidden></p>
-                  <section class="review-panel" aria-labelledby="review-title">
-                    <h3 id="review-title">Human review</h3>
-                    <p>Edit the response as needed and verify it against the evidence before downloading the packet.</p>
-                    <label for="final-response">Final response</label>
-                    <textarea id="final-response" rows="5"></textarea>
-                    <label class="review-confirmation" for="review-confirmation">
-                      <input id="review-confirmation" type="checkbox">I verified the final response and its citations against the evidence.
-                    </label>
-                    <div class="review-actions">
-                      <button class="button button-primary" id="download-packet" type="button" disabled>Download evidence packet</button>
-                      <p id="review-message" role="status"></p>
-                    </div>
-                  </section>
-                </div>
-              </section>
-            </div>
-          </section>
-        </div>
+              </div>
+            </section>
+          </div>
+        </section>
       </div>
     </main>
   </div>
@@ -551,6 +480,11 @@
     const detail = byId('detail');
     const detailState = byId('detail-state');
     const detailBody = byId('detail-body');
+    const form = byId('compose-form');
+    const composer = byId('composer');
+    const findProof = byId('find-proof');
+    const tryExample = byId('try-example');
+    const showEvidence = byId('show-evidence');
     const addEvidence = byId('add-evidence');
     const evidenceRows = byId('evidence-rows');
     const evidenceError = byId('evidence-error');
@@ -559,10 +493,15 @@
     const draftMessage = byId('draft-message');
     const copyResponse = byId('copy-response');
     const finalResponse = byId('final-response');
-    const reviewConfirmation = byId('review-confirmation');
+    const restoreEdit = byId('restore-edit');
     const reviewMessage = byId('review-message');
     const downloadPacket = byId('download-packet');
-    const evidenceLimits = { count: 8, label: 100, text: 2000 };
+    const evidenceLimits = { count: 8, label: 100, text: 2000, instruction: 1200 };
+    const guidanceRequest = 'What evidence should I gather for this dispute?';
+    const demoEvidence = {
+      'DEMO-1001': 'Carrier acceptance scan: The carrier accepted the parcel for shipment on November 4. The scan does not confirm delivery.',
+      'DEMO-1002': 'Order confirmation: The buyer ordered a dark green cotton jacket in size M. The record does not confirm which item was packed.'
+    };
 
     const reasonNames = {
       MERCHANDISE_OR_SERVICE_NOT_RECEIVED: 'Item not received',
@@ -751,8 +690,8 @@
           element('span', 'case-id', item.dispute_id),
           status
         );
-        button.addEventListener('click', () => {
-          if (selectedId !== item.dispute_id) selectCase(item.dispute_id, true);
+        button.addEventListener('click', (event) => {
+          if (selectedId !== item.dispute_id) selectCase(item.dispute_id, true, event.detail > 0);
         });
         if (item.dispute_id === focusId) toFocus = button;
         fragment.append(button);
@@ -797,7 +736,7 @@
       }
     }
 
-    async function selectCase(id, restoreFocus = false) {
+    async function selectCase(id, restoreFocus = false, pointer = false) {
       detailRequest?.abort();
       selectedId = id;
       selectedDispute = undefined;
@@ -828,30 +767,35 @@
         detailBody.hidden = false;
         if (!workspaces.has(id)) {
           workspaces.set(id, {
-            rows: [newEvidence()], revision: 0, result: null, pending: false, error: '', copyStatus: '',
-            review: { response: null, approvedAt: null, message: '' }
+            rows: [], composer: '', evidenceOpen: false, revision: 0, result: null, pending: false, error: '', copyStatus: '',
+            review: { response: null, previousEdit: null, approvedAt: null, message: '' }
           });
         }
         const workspace = workspaces.get(id);
         if (draftStaleReason(workspace)) workspace.review.approvedAt = null;
+        composer.value = workspace.composer;
+        tryExample.hidden = sourceName !== 'fixture' || !Object.hasOwn(demoEvidence, id);
+        byId('draft-original').open = false;
         renderEvidence();
         renderDraft();
+        if (pointer && matchMedia('(max-width: 690px)').matches) detail.scrollIntoView({ block: 'start' });
       } catch (error) {
         if (!controller.signal.aborted) message(detailState, 'Case details could not be loaded', error.message, () => selectCase(id));
       }
     }
 
-    function newEvidence() {
+    function newEvidence(label = '', text = '') {
       evidenceSequence += 1;
-      return { key: evidenceSequence, label: '', text: '' };
+      return { key: evidenceSequence, label, text };
     }
 
     function activeWorkspace() {
       return selectedDispute ? workspaces.get(selectedId) : undefined;
     }
 
-    function changeEvidence(workspace) {
+    function changeInputs(workspace) {
       workspace.revision += 1;
+      workspace.error = '';
       workspace.copyStatus = '';
       workspace.review.approvedAt = null;
       workspace.review.message = '';
@@ -870,7 +814,7 @@
       label.htmlFor = input.id;
       input.addEventListener('input', () => {
         row[key] = input.value;
-        changeEvidence(workspace);
+        changeInputs(workspace);
       });
       wrapper.append(label, input);
       return wrapper;
@@ -880,19 +824,20 @@
       const workspace = activeWorkspace();
       evidenceError.hidden = true;
       if (!workspace) return;
+      updateEvidenceToggle(workspace);
       addEvidence.disabled = workspace.rows.length >= evidenceLimits.count;
       const fragment = document.createDocumentFragment();
       for (const [index, row] of workspace.rows.entries()) {
         const wrapper = element('div', 'evidence-row');
         const label = makeEvidenceField(workspace, row, 'label', 'Evidence label · E' + (index + 1), 'e.g. Tracking confirmation');
-        const text = makeEvidenceField(workspace, row, 'text', 'Details', 'e.g. Carrier marked the order delivered on Oct 12.', 'textarea');
+        const text = makeEvidenceField(workspace, row, 'text', 'Details', 'Paste the relevant excerpt.', 'textarea');
         const remove = element('button', 'button icon-button');
         remove.type = 'button';
         remove.setAttribute('aria-label', 'Remove evidence item ' + (index + 1));
         remove.append(icon('trash'));
         remove.addEventListener('click', () => {
           workspace.rows.splice(index, 1);
-          changeEvidence(workspace);
+          changeInputs(workspace);
           const next = workspace.rows[index] ?? workspace.rows[index - 1];
           renderEvidence(next?.key);
           if (!next) addEvidence.focus();
@@ -920,10 +865,57 @@
       target.replaceChildren(list);
     }
 
+    function updateEvidenceToggle(workspace) {
+      const count = workspace.rows.length;
+      const label = count ? 'Labeled evidence (' + count + ')' : 'Add labeled evidence';
+      byId('evidence-toggle-label').textContent = workspace.evidenceOpen ? 'Hide labeled evidence' : label;
+      showEvidence.setAttribute('aria-expanded', String(workspace.evidenceOpen));
+      byId('evidence-editor').hidden = !workspace.evidenceOpen;
+    }
+
+    function isDirection(line) {
+      return /^(?:(?:please|can you|could you|would you|help me)\s+)*(?:draft|write|compose|prepare|summari[sz]e|review|identify|list|find|flag|check|assess|highlight|explain|tell|show|suggest|what|which|where|when|why|how|do i|is|are|revise|rewrite|make|shorten|use|focus)\b/i.test(line) ||
+        line.endsWith('?');
+    }
+
+    function parseComposer(value) {
+      const directions = [];
+      const rows = [];
+      let current;
+      for (const raw of value.split(/\r?\n/)) {
+        const line = raw.trim().replace(/^[-*]\s+/, '');
+        if (!line) {
+          if (current?.text) current = undefined;
+          continue;
+        }
+        const explicitDirection = line.match(/^instructions?\s*:\s*(.*)$/i);
+        const labeled = line.match(/^([\p{L}][\p{L}\p{N} &'’/()_-]{0,99}):\s*(.*)$/u);
+        if (explicitDirection || (!rows.length && isDirection(labeled?.[1] ?? line))) {
+          directions.push(explicitDirection ? explicitDirection[1] : line);
+          continue;
+        }
+        if (labeled || !current) {
+          current = { label: labeled?.[1].trim() ?? '', text: labeled ? labeled[2] : line };
+          rows.push(current);
+        } else {
+          current.text += (current.text ? '\n' : '') + line;
+        }
+      }
+      return { instruction: directions.join('\n').trim(), rows };
+    }
+
+    function evidenceGuidance(instruction, evidenceCount) {
+      return !evidenceCount || (
+        /\b(evidence|proof|records?|documents?)\b/i.test(instruction) &&
+        /^(what|which|how|find|identify|list|flag|show|tell)\b/i.test(instruction) &&
+        !/\b(draft|write|compose|prepare|response)\b/i.test(instruction)
+      );
+    }
+
     function draftStaleReason(workspace) {
       const { result, revision } = workspace;
       if (!result) return '';
-      if (result.revision !== revision) return 'Evidence changed.';
+      if (result.revision !== revision) return 'Draft inputs changed.';
       if (result.caseReason !== selectedDispute.reason || result.caseStatus !== selectedDispute.status) {
         return 'Case details changed.';
       }
@@ -935,96 +927,176 @@
     }
 
     function canConfirmReview(workspace) {
-      return Boolean(workspace?.result && !workspace.pending && !draftStaleReason(workspace) && responseForReview(workspace).trim());
+      return Boolean(workspace?.result?.mode === 'response' && !workspace.pending &&
+        !draftStaleReason(workspace) && responseForReview(workspace).trim());
     }
 
     function renderReview(workspace) {
       const response = responseForReview(workspace);
       if (finalResponse.value !== response) finalResponse.value = response;
-      const canConfirm = canConfirmReview(workspace);
-      const approved = canConfirm && Boolean(workspace.review.approvedAt);
-      reviewConfirmation.disabled = !canConfirm;
-      reviewConfirmation.checked = approved;
-      downloadPacket.disabled = !approved;
-      const note = workspace.pending || draftStaleReason(workspace) ? '' :
-        approved ? 'Reviewed and ready to download.' : workspace.review.message;
+      downloadPacket.disabled = !canConfirmReview(workspace);
+      restoreEdit.hidden = workspace.review.previousEdit === null;
+      restoreEdit.disabled = workspace.pending || Boolean(draftStaleReason(workspace));
+      const note = workspace.pending || draftStaleReason(workspace) ? '' : workspace.review.message;
       if (reviewMessage.textContent !== note) reviewMessage.textContent = note;
+    }
+
+    function renderCitations(result) {
+      const citations = new Set(draftEntries(result.draft.citations));
+      const evidence = document.createDocumentFragment();
+      const links = document.createDocumentFragment();
+      for (const [index, { label, text }] of result.evidence.entries()) {
+        const id = 'E' + (index + 1);
+        const source = element('article', 'source-excerpt');
+        source.id = 'source-' + id;
+        source.tabIndex = -1;
+        const heading = element('h5');
+        heading.append(element('span', 'cite', id), document.createTextNode(label));
+        source.append(heading, element('p', '', text));
+        evidence.append(source);
+        if (!citations.has(id)) continue;
+        const link = element('a', 'cite', id);
+        link.href = '#' + source.id;
+        link.title = label;
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          source.focus({ preventScroll: true });
+          source.scrollIntoView({ block: 'nearest' });
+        });
+        links.append(link);
+      }
+      if (!links.childElementCount) links.append(element('p', '', 'No citations in draft'));
+      byId('draft-citations').replaceChildren(links);
+      byId('draft-evidence').replaceChildren(evidence);
     }
 
     function renderDraft() {
       const workspace = activeWorkspace();
       if (!workspace) return;
       const { result, pending, error, copyStatus } = workspace;
+      const typed = parseComposer(workspace.composer);
+      const isQuestion = typed.instruction && evidenceGuidance(typed.instruction, typed.rows.length + workspace.rows.length);
+      composer.placeholder = workspace.rows.length ? 'Ask for a revision or paste another evidence excerpt…' : guidanceRequest;
       generate.disabled = pending;
+      findProof.disabled = pending;
+      tryExample.disabled = pending;
       generate.setAttribute('aria-busy', String(pending));
-      byId('generate-label').textContent = pending ? 'Generating…' : result ? 'Regenerate draft' : 'Generate draft';
+      byId('generate-label').textContent = pending ? 'Working…' : isQuestion ? 'Ask assistant' : 'Draft response';
       const staleReason = draftStaleReason(workspace);
-      const note = error || (pending ? 'Preparing a draft…' : staleReason ? staleReason + ' Regenerate the draft to continue review.' : copyStatus);
+      const note = error || (pending ? 'Reviewing the case and the available evidence…' :
+        staleReason ? staleReason + ' Send the updated request to continue.' : copyStatus);
       draftMessage.textContent = note;
       draftMessage.hidden = !note;
       draftMessage.classList.toggle('error', Boolean(error));
       draftOutput.hidden = !result;
       if (!result) return;
-      const { draft, model } = result;
+      const { draft, model, mode } = result;
+      const hasResponse = mode === 'response';
+      byId('draft-title').textContent = hasResponse ? 'Response draft' : 'Evidence guidance';
       byId('draft-summary').textContent = draft.summary || 'Summary unavailable.';
-      showItems(byId('draft-missing'), draft.missingEvidence, 'No missing evidence was identified in this draft.');
+      showItems(byId('draft-missing'), draft.missingEvidence, 'No missing evidence was identified.');
+      byId('guidance-next').hidden = hasResponse;
+      byId('review-panel').hidden = !hasResponse;
+      const modelNote = byId('draft-model');
+      modelNote.textContent = typeof model === 'string' && model ? model : '';
+      modelNote.hidden = !modelNote.textContent;
+      if (!hasResponse) return;
       byId('draft-response').textContent = draft.proposedResponse || 'Proposed response unavailable.';
       copyResponse.hidden = !draft.proposedResponse;
       copyResponse.disabled = pending || Boolean(staleReason);
       byId('copy-label').textContent = copyStatus === 'Draft copied.' ? 'Copied' : 'Copy draft';
-      showItems(byId('draft-citations'), draft.citations, 'This draft contains no citations.');
-      const modelNote = byId('draft-model');
-      modelNote.textContent = typeof model === 'string' && model ? 'Draft model · ' + model : '';
-      modelNote.hidden = !modelNote.textContent;
+      renderCitations(result);
       renderReview(workspace);
     }
 
-    async function generateDraft() {
+    function inputError(message, target = composer) {
+      evidenceError.textContent = message;
+      evidenceError.hidden = false;
+      target.focus();
+    }
+
+    async function generateDraft(askForGuidance = false) {
       const workspace = activeWorkspace();
       const id = selectedId;
       if (!workspace || workspace.pending) return;
+      const typed = parseComposer(workspace.composer);
+      const instruction = askForGuidance ? guidanceRequest : typed.instruction;
+      const rows = [...workspace.rows, ...typed.rows];
+      if (rows.length > evidenceLimits.count) {
+        inputError('Use up to ' + evidenceLimits.count + ' evidence excerpts per case.');
+        return;
+      }
+      if (instruction.length > evidenceLimits.instruction) {
+        inputError('Keep the instruction under ' + evidenceLimits.instruction + ' characters.');
+        return;
+      }
       const evidence = [];
-      for (const row of workspace.rows) {
-        const label = row.label.trim();
+      for (const row of rows) {
+        const isAttached = row.key !== undefined;
         const text = row.text.trim();
-        if (!label || !text) {
-          evidenceError.textContent = 'Enter a label and details for each evidence item.';
-          evidenceError.hidden = false;
-          byId('evidence-' + row.key + '-' + (label ? 'text' : 'label'))?.focus();
+        const label = row.label.trim() || (isAttached ? '' : 'Evidence excerpt ' + (evidence.length + 1));
+        if (!label || !text || text.length > evidenceLimits.text) {
+          if (isAttached) {
+            workspace.evidenceOpen = true;
+            updateEvidenceToggle(workspace);
+          }
+          inputError(
+            'Give each evidence item a label and an excerpt of up to ' + evidenceLimits.text + ' characters.',
+            isAttached ? byId('evidence-' + row.key + '-' + (label ? 'text' : 'label')) : composer
+          );
           return;
         }
         evidence.push({ label, text });
       }
-      if (!evidence.length) {
-        evidenceError.textContent = 'Add at least one evidence excerpt to generate a draft.';
-        evidenceError.hidden = false;
-        addEvidence.focus();
+      if (!evidence.length && !instruction) {
+        inputError('Ask a question or paste the evidence you want to use.');
         return;
       }
 
+      const mode = askForGuidance || evidenceGuidance(instruction, evidence.length) ? 'guidance' : 'response';
       const revision = workspace.revision;
       const requestSource = sourceName;
       const { reason: caseReason, status: caseStatus } = selectedDispute;
       workspace.pending = true;
       workspace.error = '';
       workspace.copyStatus = '';
+      evidenceError.hidden = true;
       renderDraft();
+      let completed = false;
       try {
         const data = await request('/api/disputes/' + encodeURIComponent(id) + '/draft', {
           method: 'POST',
           headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ evidence })
+          body: JSON.stringify({ evidence, instruction })
         });
         if (typeof data?.draft?.proposedResponse !== 'string') throw new Error('The draft was missing from the response.');
         if (data.source !== requestSource) throw new Error('The case source changed. Refresh the dispute queue and generate a new draft.');
-        workspace.result = { ...data, revision, evidence, caseReason, caseStatus };
+        workspace.result = { ...data, revision, evidence, caseReason, caseStatus, mode };
         workspace.review.approvedAt = null;
-        workspace.review.message = workspace.review.response === null ? '' : 'Your edits were kept. Verify them against the new draft and evidence.';
+        workspace.review.previousEdit = workspace.review.response ?? workspace.review.previousEdit;
+        workspace.review.response = null;
+        workspace.review.message = '';
+        if (revision === workspace.revision) {
+          const attached = evidence.slice(workspace.rows.length);
+          workspace.rows.push(...attached.map(({ label, text }) => newEvidence(label, text)));
+          workspace.composer = '';
+          completed = true;
+        }
       } catch (error) {
         workspace.error = error.message;
       } finally {
         workspace.pending = false;
-        if (activeWorkspace() === workspace) renderDraft();
+        if (activeWorkspace() === workspace) {
+          if (completed) {
+            composer.value = workspace.composer;
+            byId('draft-original').open = false;
+            renderEvidence();
+          }
+          renderDraft();
+          if (completed && (form.contains(document.activeElement) || document.activeElement === document.body)) {
+            draftOutput.focus();
+          }
+        }
       }
     }
 
@@ -1075,15 +1147,50 @@
     query.addEventListener('input', () => renderQueue());
     filter.addEventListener('change', () => renderQueue());
     refresh.addEventListener('click', loadCases);
+    composer.addEventListener('input', () => {
+      const workspace = activeWorkspace();
+      if (!workspace) return;
+      workspace.composer = composer.value;
+      changeInputs(workspace);
+    });
+    composer.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      generateDraft();
+    });
+    findProof.addEventListener('click', () => generateDraft(true));
+    tryExample.addEventListener('click', () => {
+      const workspace = activeWorkspace();
+      const sample = demoEvidence[selectedId];
+      if (!workspace || !sample) return;
+      const existing = workspace.composer.trim();
+      if (!existing.includes(sample) && !workspace.rows.some(({ label, text }) => label + ': ' + text === sample)) {
+        composer.value = (existing || 'Draft a response and flag missing proof.') + '\n\n' + sample;
+        workspace.composer = composer.value;
+        changeInputs(workspace);
+      }
+      composer.focus();
+    });
+    showEvidence.addEventListener('click', () => {
+      const workspace = activeWorkspace();
+      if (!workspace) return;
+      workspace.evidenceOpen = !workspace.evidenceOpen;
+      updateEvidenceToggle(workspace);
+      if (workspace.evidenceOpen && !workspace.rows.length) addEvidence.click();
+    });
     addEvidence.addEventListener('click', () => {
       const workspace = activeWorkspace();
       if (!workspace || workspace.rows.length >= evidenceLimits.count) return;
       const row = newEvidence();
       workspace.rows.push(row);
-      changeEvidence(workspace);
+      changeInputs(workspace);
       renderEvidence(row.key);
     });
-    generate.addEventListener('click', generateDraft);
     copyResponse.addEventListener('click', async () => {
       const workspace = activeWorkspace();
       const text = workspace?.result?.draft.proposedResponse;
@@ -1101,21 +1208,27 @@
       if (!workspace?.result) return;
       const { review, result } = workspace;
       review.response = finalResponse.value === result.draft.proposedResponse ? null : finalResponse.value;
-      if (review.approvedAt) review.message = 'Review cleared. Confirm the updated response.';
+      if (review.approvedAt) review.message = 'Review the updated response before exporting again.';
       review.approvedAt = null;
       renderReview(workspace);
     });
-    reviewConfirmation.addEventListener('change', () => {
+    restoreEdit.addEventListener('click', () => {
       const workspace = activeWorkspace();
-      if (!canConfirmReview(workspace)) return;
-      workspace.review.approvedAt = reviewConfirmation.checked ? new Date().toISOString() : null;
-      workspace.review.message = '';
+      if (!workspace?.result || workspace.pending || draftStaleReason(workspace)) return;
+      workspace.review.response = workspace.review.previousEdit;
+      workspace.review.previousEdit = null;
+      workspace.review.approvedAt = null;
+      workspace.review.message = 'Previous edit restored. Verify it against the current evidence.';
       renderReview(workspace);
+      finalResponse.focus();
     });
     downloadPacket.addEventListener('click', () => {
       const workspace = activeWorkspace();
-      if (!canConfirmReview(workspace) || !workspace.review.approvedAt) return;
+      if (!canConfirmReview(workspace)) return;
+      workspace.review.approvedAt ??= new Date().toISOString();
       exportEvidencePacket(workspace, selectedDispute.dispute_id);
+      workspace.review.message = 'Evidence packet exported.';
+      renderReview(workspace);
     });
 
     message(detailState, 'Select a dispute', 'Case details and response drafting appear here.');

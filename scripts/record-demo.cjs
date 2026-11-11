@@ -13,6 +13,8 @@ const exampleModel = 'Example draft (no model called)';
 const reason = 'MERCHANDISE_OR_SERVICE_NOT_RECEIVED';
 const evidenceLabel = 'Carrier acceptance scan';
 const evidence = 'The carrier accepted the test parcel for shipment on November 4. The scan does not confirm delivery.';
+const instruction = 'Draft a response and flag missing proof.';
+const composerPrompt = instruction + '\n\n' + evidenceLabel + ': ' + evidence;
 const finalResponse = 'The carrier accepted the test parcel for shipment on November 4 [E1]. We are checking for delivery confirmation.';
 const viewport = { width: 1280, height: 720 };
 
@@ -47,29 +49,29 @@ async function addRecordingOverlay(page) {
     style.textContent = `
       #recording-caption {
         position: fixed; z-index: 20; bottom: 16px; left: 16px; right: 16px;
-        padding: 13px 18px; border: 1px solid #68768e; border-radius: 9px;
-        background: #182439; color: #f7f8fc; box-shadow: 0 5px 20px #18243933;
+        padding: 13px 18px; border: 1px solid #648373; border-radius: 9px;
+        background: #142c24; color: #f2f8f2; box-shadow: 0 5px 20px #142c2433;
         font: 550 16px/1.4 system-ui, sans-serif;
         display: flex; align-items: baseline; gap: 16px; pointer-events: none;
       }
       #recording-caption strong {
-        color: #d0c7ff; border-right: 1px solid #68768e; padding-right: 16px; white-space: nowrap;
+        color: #d1ecd5; border-right: 1px solid #648373; padding-right: 16px; white-space: nowrap;
       }
       #recording-pointer {
         position: fixed; z-index: 21; top: 0; left: 0; width: 19px; height: 19px;
-        margin: -9px; border: 2px solid #5941c3; border-radius: 50%; background: #b6a9ff47;
+        margin: -9px; border: 2px solid #205640; border-radius: 50%; background: #a4d7b247;
         box-shadow: 0 0 0 2px #fff; pointer-events: none;
       }
       #recording-packet {
         position: fixed; z-index: 19; inset: 72px max(42px, calc((100vw - 760px)/2)) 88px;
-        display: flex; flex-direction: column; overflow: hidden; border: 1px solid #dce3ee;
-        border-radius: 12px; background: #fff; box-shadow: 0 0 0 200vmax #18243999;
+        display: flex; flex-direction: column; overflow: hidden; border: 1px solid #dce4dd;
+        border-radius: 12px; background: #fff; box-shadow: 0 0 0 200vmax #142c2499;
       }
       #recording-packet h2 {
-        padding: 17px 23px; color: #182439; border-bottom: 1px solid #dce3ee; font-size: 17px;
+        padding: 17px 23px; color: #142c24; border-bottom: 1px solid #dce4dd; font-size: 17px;
       }
       #recording-packet pre {
-        overflow: auto; white-space: pre-wrap; padding: 6px 23px; color: #26334b; line-height: 1.55;
+        overflow: auto; white-space: pre-wrap; padding: 6px 23px; color: #263a2f; line-height: 1.55;
       }
     `;
     const caption = document.createElement('aside');
@@ -129,8 +131,9 @@ async function capture(page, address, { source, liveAI, expectedModel }) {
   await caseRow.hover();
   await caption(page, 'Open a case', 'Check the dispute reason, status, amount, and seller response deadline when available.');
   await hold(900);
+  const detailAddress = address + '/api/disputes/' + encodeURIComponent(selected.dispute_id);
   const loadDetail = await caseRow.getAttribute('aria-pressed') === 'true' ? null :
-    page.waitForResponse(response => response.url() === address + '/api/disputes/' + selected.dispute_id, { timeout: 13_000 });
+    page.waitForResponse(response => response.url() === detailAddress, { timeout: 13_000 });
   await caseRow.click();
   if (loadDetail) await apiResult(await loadDetail, 'Loading the test dispute', source);
   await page.locator('#detail-body').waitFor();
@@ -140,61 +143,66 @@ async function capture(page, address, { source, liveAI, expectedModel }) {
   await page.locator('#detail-due').hover();
   await hold(3500);
 
-  await caption(page, 'Add evidence', 'This sample carrier scan documents shipment. The evidence label gives the excerpt its E1 reference.');
-  const label = page.getByLabel('Evidence label · E1');
-  const details = page.getByLabel('Details', { exact: true });
-  await focusView(label);
-  await label.pressSequentially(evidenceLabel, { delay: 32 });
-  await details.hover();
-  await details.pressSequentially(evidence, { delay: 20 });
+  await caption(page, 'Ask the assistant', 'Paste the drafting request and a labeled evidence excerpt into the same message.');
+  const composer = page.locator('#composer');
+  await focusView(composer);
+  await hold(800);
+  await composer.fill(composerPrompt);
   await hold(3600);
 
-  const generate = page.getByRole('button', { name: 'Generate draft' });
+  const generate = page.locator('#generate');
   await generate.hover();
   await caption(page, 'Draft a response', liveAI
-    ? 'The live AI model drafts a response from the case and evidence excerpt.'
-    : 'PayCrew builds an example draft from the case and evidence excerpt.');
+    ? 'The configured AI model drafts from the case and the pasted evidence.'
+    : 'PayCrew builds an example draft from the case and the pasted evidence.');
   await hold(1200);
-  const loadDraft = page.waitForResponse(response => response.url() === address + '/api/disputes/' + selected.dispute_id + '/draft', { timeout: 48_000 });
+  const loadDraft = page.waitForResponse(response => response.url() === detailAddress + '/draft', { timeout: 48_000 });
   await generate.click();
-  const { draft, model } = await apiResult(await loadDraft, 'Generating the response draft', source);
+  const draftResponse = await loadDraft;
+  const { draft, model } = await apiResult(draftResponse, 'Generating the response draft', source);
+  const draftInput = draftResponse.request().postDataJSON();
+  assert.equal(draftInput.instruction, instruction, 'The drafting request did not reach the assistant.');
+  assert.deepEqual(draftInput.evidence, [{ label: evidenceLabel, text: evidence }]);
   assert.equal(model, expectedModel);
   assert(draft.citations.includes('E1') && draft.proposedResponse.includes('[E1]'), 'The draft did not cite the supplied excerpt.');
   assert(draft.missingEvidence.length > 0, 'The draft did not identify evidence to verify.');
 
-  await caption(page, 'Trace the draft', 'Review the missing records and match the [E1] citation to the carrier scan.');
+  await page.locator('#draft-output').waitFor();
+  await caption(page, 'Trace the draft', 'Check what proof is missing, then follow [E1] to the carrier scan.');
   await focusView(page.locator('#draft-missing'));
   await hold(4300);
-  await focusView(page.locator('#draft-citations'));
-  await hold(4700);
+  const citation = page.locator('#draft-citations').getByRole('link', { name: 'E1', exact: true });
+  await focusView(citation);
+  await hold(650);
+  await citation.click();
+  const draftEvidence = page.locator('#source-E1');
+  await focusView(draftEvidence);
+  const sourceExcerpt = await draftEvidence.textContent();
+  assert(sourceExcerpt.includes(evidenceLabel) && sourceExcerpt.includes(evidence), 'The draft did not show the source excerpt.');
+  await hold(4200);
 
   await caption(page, 'Edit the response', 'The reviewer can make the shipment wording precise and keep the evidence reference.');
-  const review = page.getByRole('textbox', { name: 'Final response', exact: true });
-  const downloadButton = page.getByRole('button', { name: 'Download evidence packet' });
+  const review = page.locator('#final-response');
+  const downloadButton = page.locator('#download-packet');
   await focusView(review);
-  assert(await downloadButton.isDisabled(), 'The evidence packet can be exported before review.');
   await hold(1900);
   await review.fill('');
+  assert(await downloadButton.isDisabled(), 'A blank response can be approved.');
   await review.pressSequentially(finalResponse, { delay: 23 });
   await hold(3400);
 
-  await caption(page, 'Confirm the review', 'In this walkthrough, checking the review box enables export of the edited response.');
-  const confirmation = page.locator('#review-confirmation');
-  await focusView(confirmation);
-  await hold(1300);
-  await confirmation.check();
-  await hold(4000);
-
-  await caption(page, 'Export the packet', 'Download the evidence, draft, and reviewer-approved response in one text file.');
+  await caption(page, 'Approve and download', 'Confirm your reviewed response and export the evidence packet in one action.');
   await focusView(downloadButton);
-  await hold(1200);
+  assert(await downloadButton.isEnabled(), 'The edited response cannot be approved.');
+  await hold(2700);
   const downloadEvent = page.waitForEvent('download');
   await downloadButton.click();
   const download = await downloadEvent;
   const packet = await readFile(await download.path(), 'utf8');
-  assert(packet.includes('Source: ' + sourceName) && packet.includes('[E1] ' + evidenceLabel) &&
+  assert(packet.includes('Source: ' + sourceName) && packet.includes('Model: ' + expectedModel) &&
+    packet.includes('[E1] ' + evidenceLabel + '\n' + evidence) &&
     packet.includes('Reviewer-approved response\n' + finalResponse) && /Reviewed at \(UTC\): \d{4}-/.test(packet),
-    'The downloaded evidence packet did not include the case source, cited evidence, and confirmed edit.');
+    'The downloaded evidence packet did not include the case source, draft model, cited evidence, and confirmed edit.');
 
   await page.evaluate(({ filename, packet }) => {
     const preview = document.createElement('section');

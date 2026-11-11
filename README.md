@@ -1,6 +1,6 @@
 # PayCrew
 
-PayCrew is a merchant dispute review workspace. It reads cases from PayPal Sandbox, drafts a response against keyed evidence, and lets a reviewer edit, approve, and export the response together with its source excerpts.
+PayCrew is a case-aware assistant for merchant disputes. Open a PayPal Sandbox case, ask what is missing or paste order notes, and get an evidence-linked response you can edit, approve, and export.
 
 ## Run locally
 
@@ -22,18 +22,16 @@ node --env-file=.env server.mjs
 
 The application only calls the PayPal Sandbox API host. It retrieves a token and reads the first 50 disputes and individual case details. A successful connection with zero disputes should produce an empty inbox. To exercise case review, use a sandbox personal buyer and the sandbox business tied to the merchant app. Complete a test payment and use the buyer’s Sandbox Resolution Center to report a problem with that payment.
 
-The configured model receives the dispute reason, status and reviewer-entered evidence excerpts. Use sanitized excerpts for testing. PayPal access is read-only. The merchant can use the exported packet when responding in PayPal.
+The model receives the case reason, status, amount and deadline, along with the request and evidence excerpts you enter. Use sanitized excerpts for testing. PayPal access is read-only. The merchant can use the exported packet when responding in PayPal.
 
 - [PayPal Sandbox setup](https://developer.paypal.com/platforms/disputes/set-up/)
 - [PayPal Disputes API](https://developer.paypal.com/platforms/disputes/handle-disputes/use-disputes-api/)
 
 ## Demo sequence
 
-1. Open the inbox and show the data source.
-2. Open a case and check the reason, amount, status and response deadline if available.
-3. Add an evidence excerpt. Generate a draft and verify each reference against the supplied evidence.
-4. Review the missing records, edit the proposed response, and explicitly approve it.
-5. Download the evidence packet. It records the case, cited excerpts, draft, gaps, and reviewed response.
+1. Open a case and ask what to verify. PayCrew uses the selected case details.
+2. Paste evidence into the same composer and ask for a draft. Open the references to check the underlying excerpts.
+3. Edit and confirm the response, then download the case, evidence, draft, and reviewed response as one packet.
 
 The server binds to localhost. Save the downloaded packet to retain a review across sessions.
 
